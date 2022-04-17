@@ -1,0 +1,23 @@
+﻿
+@{
+    Layout = null;
+}
+
+@using Topics.Repository.Models.DB;
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Home</title>
+</head>
+<body>
+    <header>
+        @foreach (GenderModel gender in ViewBag.Genders)
+            {
+                <p>@gender.Name</p>
+            }
+    </header>
+</body>
+</html>
