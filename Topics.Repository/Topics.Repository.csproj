@@ -41,8 +41,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DBOperations\TestOperations.cs" />
-    <Compile Include="Models\DB\GenderModel.cs" />
+    <Compile Include="DBOperations\UserOperations.cs" />
+    <Compile Include="Models\DB\UserModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

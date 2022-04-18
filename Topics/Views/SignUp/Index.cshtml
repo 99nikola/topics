@@ -1,44 +1,65 @@
 ﻿
 @{
-    Layout = null;
+    Layout = "~/Views/Shared/Layouts/_BasicLayout.cshtml";
 }
 
-<!DOCTYPE html>
+@section Title {
+    Sign Up
+}
 
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Signin Template · Bootstrap v5.1</title>
+@section Import {}
 
-    <link href="~/Content/bootstrap.css" rel="stylesheet" />
+<form method="POST" action="/signup">
+    <div class="container text-center d-flex flex-column align-items-center mt-5 gap-2">
+        <h1 class="h3 mb-3 fw-normal">Sign Up</h1>
 
-    <!-- Custom styles for this template -->
-    <link href="signin.css" rel="stylesheet">
-</head>
-<body>
-    <main>
-        <form class="container text-center">
-            <p>Logo TODO</p>
-            <h1 class="h3 mb-3 fw-normal">Please sign in</h1>
+        <div class="form-floating">
+            <input 
+                   class="form-control" 
+                   id="floatingUsername" 
+                   placeholder="Username" 
+                   name="username" required 
+             />
+            <label for="floatingUsername">Username</label>
+        </div>
 
-            <div class="form-floating">
-                <input type="email" class="form-control" id="floatingInput" placeholder="name@example.com">
-                <label for="floatingInput">Email address</label>
-            </div>
-            <div class="form-floating">
-                <input type="password" class="form-control" id="floatingPassword" placeholder="Password">
-                <label for="floatingPassword">Password</label>
-            </div>
+        <div class="form-floating">
+            <input 
+                   type="email" 
+                   class="form-control" 
+                   id="floatingEmail" 
+                   placeholder="name@example.com" 
+                   name="email" required 
+            />
+            <label for="floatingEmail">Email address</label>
+        </div>
 
-            <div class="checkbox mb-3">
-                <label>
-                    <input type="checkbox" value="remember-me"> Remember me
-                </label>
-            </div>
-            <button class="w-100 btn btn-lg btn-primary" type="submit">Sign in</button>
-            <p class="mt-5 mb-3 text-muted">&copy; 2017–2021</p>
-        </form>
-    </main>
-</body>
-</html>
+        <div class="form-floating">
+            <input 
+                   type="password" 
+                   class="form-control" 
+                   id="floatingPassword" 
+                   placeholder="Password" 
+                   name="password" 
+                   required 
+                   minlength="6" 
+            />
+            <label for="floatingPassword">Password</label>
+        </div>
+
+        <div class="form-floating">
+            <input 
+                   type="password" 
+                   class="form-control" 
+                   id="floatingPasswordRepeat" 
+                   placeholder="Repeat Password" 
+                   name="passwordRepeat" 
+                   required 
+                   minlength="6" 
+            />
+            <label for="floatingPasswordRepeat">Repeat Password</label>
+        </div>
+
+        <button class="btn btn-lg btn-primary" type="submit">Sign in</button>
+    </div>
+</form>

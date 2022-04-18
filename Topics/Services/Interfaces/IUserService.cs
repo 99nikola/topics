@@ -7,8 +7,8 @@ using Topics.Repository.Models.DB;
 
 namespace Topics.Services.Interfaces
 {
-    public interface ITestService
+    public interface IUserService
     {
-        List<GenderModel> GetGenders();
+        bool CreateUser(UserModel user);
     }
 }

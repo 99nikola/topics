@@ -8,17 +8,17 @@ using Topics.Services.Interfaces;
 
 namespace Topics.Services.Implementations
 {
-    public class TestService : ITestService
+    public class UserService : IUserService
     {
-        public List<GenderModel> GetGenders()
+        
+        public bool CreateUser(UserModel user)
         {
             string connectionString = System.
                                         Configuration.
                                         ConfigurationManager.
                                         ConnectionStrings["TopicsDB"].
                                         ConnectionString;
-
-            return TestOperations.GetGenders(connectionString);
+            return UserOperations.CreateUser(user, connectionString);
         }
     }
 }

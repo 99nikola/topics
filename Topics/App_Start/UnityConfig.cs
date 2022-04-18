@@ -44,7 +44,7 @@ namespace Topics
             // TODO: Register your type's mappings here.
             // container.RegisterType<IProductRepository, ProductRepository>();
 
-            container.RegisterType<ITestService, TestService>();
+            container.RegisterType<IUserService, UserService>();
         }
     }
 }
