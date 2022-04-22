@@ -6,6 +6,8 @@ using System.Web.Mvc;
 using Topics.Repository.Models.DB;
 using Topics.Services.Interfaces;
 using Topics.Models.SignUp;
+using Topics.Constants;
+using System.Web.Routing;
 
 namespace Topics.Controllers
 {
@@ -39,6 +41,7 @@ namespace Topics.Controllers
                 return View(formUser);
             }
 
+
             UserModel user = new UserModel
             {
                 Username = userCredentials["username"],
@@ -47,6 +50,10 @@ namespace Topics.Controllers
             };
 
             bool created = userService.CreateUser(user);
+            
+            if (created)
+                return Redirect(Routes.HOME);
+
             return View();
         }
     }

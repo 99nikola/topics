@@ -249,7 +249,9 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\UnityConfig.cs" />
     <Compile Include="App_Start\UnityMvcActivator.cs" />
+    <Compile Include="Constants\Routes.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\SignInController.cs" />
     <Compile Include="Controllers\SignUpController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -267,6 +269,7 @@
     <Content Include="Scripts\jquery-3.6.0.min.map" />
     <Content Include="Views\SignUp\Index.cshtml" />
     <Content Include="Views\Shared\Layouts\_BasicLayout.cshtml" />
+    <Content Include="Views\SignIn\Index.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

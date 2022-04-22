@@ -20,5 +20,16 @@ namespace Topics.Services.Implementations
                                         ConnectionString;
             return UserOperations.CreateUser(user, connectionString);
         }
+
+        public UserModel GetUser(string username, string password)
+        {
+            string connectionString = System.
+                                        Configuration.
+                                        ConfigurationManager.
+                                        ConnectionStrings["TopicsDB"].
+                                        ConnectionString;
+
+            return UserOperations.GetUser(username, password, connectionString);
+        }
     }
 }

@@ -10,5 +10,6 @@ namespace Topics.Services.Interfaces
     public interface IUserService
     {
         bool CreateUser(UserModel user);
+        UserModel GetUser(string username, string password);
     }
 }

@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.Helpers;
 using Topics.Repository.Models.DB;
 using Topics.Repository.Models.Error;
 
@@ -18,6 +19,8 @@ namespace Topics.Repository.DBOperations
             {
                 try
                 {
+                    string hashedPassword = Crypto.HashPassword(user.Password);
+
                     connection.ConnectionString = connectionString;
                     connection.Open();
 
@@ -26,12 +29,12 @@ namespace Topics.Repository.DBOperations
                         Connection = connection,
 
                         CommandText =
-                        "INSERT INTO AppUser (username, email, password)" +
-                        "VALUES (@Username, @Email, @Password)"
+                        "INSERT INTO AppUser (username, email, password) " +
+                        "VALUES (@username, @email, @password); "
                     };
-                    insert.Parameters.AddWithValue("Username", user.Username);
-                    insert.Parameters.AddWithValue("Email", user.Email);
-                    insert.Parameters.AddWithValue("Password", user.Password);
+                    insert.Parameters.AddWithValue("username", user.Username);
+                    insert.Parameters.AddWithValue("email", user.Email);
+                    insert.Parameters.AddWithValue("password", hashedPassword);
 
                     int rowsAffected = insert.ExecuteNonQuery();
 
@@ -41,9 +44,58 @@ namespace Topics.Repository.DBOperations
                 }
                 catch (SqlException ex)
                 {
-                    /*if (ex.Number == 2627)
-                        return new Error { Message = ex.Message, Number = ex.Number };*/
+                    Debug.WriteLine(ex.Message);
                     return false;
+                }
+            }
+        }
+
+        public static UserModel GetUser(string username, string password, string connectionString)
+        {
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                try
+                {
+                    connection.ConnectionString = connectionString;
+                    connection.Open();
+
+                    SqlCommand selectUser = new SqlCommand()
+                    {
+                        Connection = connection,
+                        CommandText =
+                        "SELECT * " +
+                        "FROM AppUser " +
+                        "WHERE username = @username ;"
+                    };
+
+                    selectUser.Parameters.AddWithValue("username", username);
+
+                    SqlDataReader reader = selectUser.ExecuteReader();
+
+                    reader.Read();
+
+                    bool verified = Crypto.VerifyHashedPassword(reader.GetString(2), password);
+
+                    if (!verified)
+                        return null;
+
+                    UserModel user = new UserModel
+                    {
+                        Username = reader.GetString(0),
+                        Email = reader.GetString(1),
+                        Password = reader.GetString(2),
+                        DisplayName = Utils.ConvertFromDBVal<string>(reader.GetValue(3)),
+                        Avatar = Utils.ConvertFromDBVal<string>(reader.GetValue(4)),
+                        About = Utils.ConvertFromDBVal<string>(reader.GetValue(5))
+                    };
+
+                    connection.Close();
+
+                    return user;
+                }
+                catch (Exception ex)
+                {
+                    return null;   
                 }
             }
         }
