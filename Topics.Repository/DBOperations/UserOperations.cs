@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Topics.Repository.Models.DB;
+using Topics.Repository.Models.Error;
 
 namespace Topics.Repository.DBOperations
 {
@@ -37,9 +39,10 @@ namespace Topics.Repository.DBOperations
 
                     return rowsAffected == 1;
                 }
-                catch (Exception ex)
+                catch (SqlException ex)
                 {
-
+                    /*if (ex.Number == 2627)
+                        return new Error { Message = ex.Message, Number = ex.Number };*/
                     return false;
                 }
             }

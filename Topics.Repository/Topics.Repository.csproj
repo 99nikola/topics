@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="DBOperations\UserOperations.cs" />
     <Compile Include="Models\DB\UserModel.cs" />
+    <Compile Include="Models\DB\Error.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup />

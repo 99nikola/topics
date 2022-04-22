@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using Topics.Repository.Models.DB;
 using Topics.Services.Interfaces;
+using Topics.Models.SignUp;
 
 namespace Topics.Controllers
 {
@@ -18,7 +18,6 @@ namespace Topics.Controllers
             this.userService = userService;
         }
 
-
         [HttpGet]
         public ActionResult Index()
         {
@@ -28,11 +27,16 @@ namespace Topics.Controllers
         [HttpPost]
         public ActionResult Index(FormCollection userCredentials)
         {
+            FormErrorModel formUser = new FormErrorModel
+            {
+                Username = userCredentials["username"],
+                Email = userCredentials["email"],
+                ErrorMessage = "Passwords don't match!"
+            };
+
             if (!userCredentials["password"].Equals(userCredentials["passwordRepeat"]))
             {
-                // TODO handle error
-                Debug.WriteLine("Passwrods don't match!");
-                return View("Index");
+                return View(formUser);
             }
 
             UserModel user = new UserModel
@@ -43,8 +47,7 @@ namespace Topics.Controllers
             };
 
             bool created = userService.CreateUser(user);
-            Debug.WriteLine(created);
-            return View("Index");
+            return View();
         }
     }
 }
