@@ -10,26 +10,30 @@ namespace Topics.Services.Implementations
 {
     public class UserService : IUserService
     {
+
+        private string ConnectionString
+        {
+            get => System.
+                    Configuration.
+                    ConfigurationManager.
+                    ConnectionStrings["TopicsDB"].
+                    ConnectionString;
+        }
         
         public bool CreateUser(UserModel user)
         {
-            string connectionString = System.
-                                        Configuration.
-                                        ConfigurationManager.
-                                        ConnectionStrings["TopicsDB"].
-                                        ConnectionString;
-            return UserOperations.CreateUser(user, connectionString);
+            return UserOperations.CreateUser(user, ConnectionString);
+        }
+
+        public bool ValidateUser(string username, string password)
+        {
+            return UserOperations.ValidateUser(username, password, ConnectionString);
         }
 
         public UserModel GetUser(string username, string password)
         {
-            string connectionString = System.
-                                        Configuration.
-                                        ConfigurationManager.
-                                        ConnectionStrings["TopicsDB"].
-                                        ConnectionString;
-
-            return UserOperations.GetUser(username, password, connectionString);
+            return UserOperations.GetUser(username, password, ConnectionString);
         }
+
     }
 }

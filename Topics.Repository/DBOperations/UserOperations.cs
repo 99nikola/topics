@@ -72,8 +72,8 @@ namespace Topics.Repository.DBOperations
 
                     SqlDataReader reader = selectUser.ExecuteReader();
 
-                    reader.Read();
 
+                    reader.Read();
                     bool verified = Crypto.VerifyHashedPassword(reader.GetString(2), password);
 
                     if (!verified)
@@ -95,9 +95,48 @@ namespace Topics.Repository.DBOperations
                 }
                 catch (Exception ex)
                 {
+                    Debug.Write(ex.Message);
                     return null;   
                 }
             }
+        }
+    
+        public static bool ValidateUser(string username, string password, string connectionString)
+        {
+            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+                return false;
+
+            using (SqlConnection connection = new SqlConnection())
+            {
+                try
+                {
+                    SqlCommand selectUser = new SqlCommand()
+                    {
+                        Connection = connection,
+                        CommandText =
+                            "SELECT password " +
+                            "FROM AppUser " +
+                            "WHERE username = @username ;"
+                    };
+
+                    SqlDataReader reader = selectUser.ExecuteReader();
+                    reader.Read();
+
+                    string hashedPassword = Utils.ConvertFromDBVal<string>(reader.GetValue(0));
+
+                    if (hashedPassword == null)
+                        return false;
+
+                    bool isValid = Crypto.VerifyHashedPassword(hashedPassword, password);
+
+                    return isValid;
+                } catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                    return false;
+                }
+            }
+
         }
     }
 }
