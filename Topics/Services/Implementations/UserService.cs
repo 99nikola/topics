@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using Topics.Repository.DBOperations;
+using Topics.Repository.Models.Account;
 using Topics.Repository.Models.DB;
 using Topics.Services.Interfaces;
 
@@ -20,7 +21,7 @@ namespace Topics.Services.Implementations
                     ConnectionString;
         }
         
-        public bool CreateUser(UserModel user)
+        public bool CreateUser(SignUpViewModel user)
         {
             return UserOperations.CreateUser(user, ConnectionString);
         }
@@ -33,6 +34,11 @@ namespace Topics.Services.Implementations
         public UserModel GetUser(string username, string password)
         {
             return UserOperations.GetUser(username, password, ConnectionString);
+        }
+
+        public UserModel GetUser(string username)
+        {
+            return UserOperations.GetUser(username, ConnectionString);
         }
 
     }

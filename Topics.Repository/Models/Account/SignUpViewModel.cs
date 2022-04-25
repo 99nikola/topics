@@ -3,18 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 
-namespace Topics.DataAccess
+namespace Topics.Repository.Models.Account
 {
-    public class User
+    public class SignUpViewModel
     {
-        public int Id { get; set; }
         public string Username { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
-        public bool IsActive { get; set; }
+        public string ConfirmPassword { get; set; }
         public Guid ActivationCode { get; set; }
-        public virtual ICollection<Role> Roles { get; set; }
     }
 }

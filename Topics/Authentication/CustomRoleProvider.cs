@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Security;
+using Topics.Services.Implementations;
 using Topics.Services.Interfaces;
 
 namespace Topics.Authentication
@@ -11,9 +12,9 @@ namespace Topics.Authentication
     {
         private IUserService userService; 
 
-        public CustomRoleProvider(IUserService userService)
+        public CustomRoleProvider()
         {
-            this.userService = userService;
+            this.userService = new UserService();
         }
 
         public override bool IsUserInRole(string username, string roleName)
@@ -26,9 +27,9 @@ namespace Topics.Authentication
         {
             if (!HttpContext.Current.User.Identity.IsAuthenticated) return null;
 
-            string[] userRoles = userService.GetUserRoles(username);
+            //string[] userRoles = userService.GetUserRoles(username);
 
-            return userRoles;
+            return null;
         }
 
         public override string ApplicationName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }

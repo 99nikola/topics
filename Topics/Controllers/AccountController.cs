@@ -1,19 +1,25 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Diagnostics;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
 using Topics.Authentication;
-using Topics.DataAccess;
+using Topics.Repository.Models.Account;
+using Topics.Services.Interfaces;
 
 namespace Topics.Controllers
 {
     [AllowAnonymous]
     public class AccountController : Controller
     {
-        // GET: Account
+        private IUserService userService;
+        public AccountController(IUserService userService)
+        {
+            this.userService = userService;
+        }
+
+        [HttpGet]
         public ActionResult Index()
         {
             return View();
@@ -44,10 +50,10 @@ namespace Topics.Controllers
             {
                 CustomSerializeModel userModel = new CustomSerializeModel()
                 {
-                    UserId = user.UserId,
-                    FirstName = user.FirstName,
+                    Username = user.Username,
+                    /*FirstName = user.FirstName,
                     LastName = user.LastName,
-                    RoleName = user.Roles.Select(role => role.Name).ToList()
+                    RoleName = user.Roles.Select(role => role.Name).ToList()*/
                 };
 
                 string userData = JsonConvert.SerializeObject(userModel);
@@ -75,32 +81,22 @@ namespace Topics.Controllers
         public ActionResult SignUp(SignUpViewModel signUp)
         {
             bool signUpStatus = false;
-            string signUpMessage = string.Empty;
+            string signUpMessage;
 
             if (ModelState.IsValid)
             {
-                string username = Membership.GetUserNameByEmail(signUp.Email);
-                if (!string.IsNullOrEmpty(username))
+                var user = (CustomMembershipUser)Membership.GetUser(signUp.Username, false);
+                Debug.WriteLine(user);
+                if (user != null)
                 {
-                    ModelState.AddModelError("Warning Email", "Sorry: Email already exists");
+                    ModelState.AddModelError("ErrorUsername", "Sorry: Username already exists");
                     return View(signUp);
                 }
 
-                var user = new User()
-                {
-                    Username = signUp.Username,
-                    FirstName = signUp.FirstName,
-                    LastName = signUp.LastName,
-                    Email = signUp.Email,
-                    Password = signUp.Password,
-                    ActivationCode = Guid.NewGuid()
-                };
 
-                userService.CreateUser(user);
+                userService.CreateUser(signUp);
                 signUpMessage = "Your account has been created successfully :D";
                 signUpStatus = true;
-
-                // Verification Email
             } else
             {
                 signUpMessage = "Something went wrong!";

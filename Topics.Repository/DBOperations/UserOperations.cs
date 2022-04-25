@@ -6,14 +6,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Helpers;
+using Topics.Repository.Models.Account;
 using Topics.Repository.Models.DB;
-using Topics.Repository.Models.Error;
 
 namespace Topics.Repository.DBOperations
 {
     public class UserOperations
     {
-        public static bool CreateUser(UserModel user, string connectionString)
+        public static bool CreateUser(SignUpViewModel user, string connectionString)
         {
             using (SqlConnection connection = new SqlConnection())
             {
@@ -52,7 +52,19 @@ namespace Topics.Repository.DBOperations
 
         public static UserModel GetUser(string username, string password, string connectionString)
         {
-            using (SqlConnection connection = new SqlConnection(connectionString))
+            UserModel user = GetUser(username, connectionString);
+
+            bool verified = Crypto.VerifyHashedPassword(user.HashedPassword, password);
+
+            if (!verified)
+                return null;
+
+            return user;
+        }
+    
+        public static UserModel GetUser(string username, string connectionString)
+        {
+            using (SqlConnection connection = new SqlConnection())
             {
                 try
                 {
@@ -63,30 +75,24 @@ namespace Topics.Repository.DBOperations
                     {
                         Connection = connection,
                         CommandText =
-                        "SELECT * " +
-                        "FROM AppUser " +
-                        "WHERE username = @username ;"
+                            "SELECT * " +
+                            "FROM AppUser " +
+                            "WHERE username = @username ;"
                     };
 
                     selectUser.Parameters.AddWithValue("username", username);
 
                     SqlDataReader reader = selectUser.ExecuteReader();
 
-
                     reader.Read();
-                    bool verified = Crypto.VerifyHashedPassword(reader.GetString(2), password);
 
-                    if (!verified)
-                        return null;
-
-                    UserModel user = new UserModel
+                    UserModel user = new UserModel()
                     {
                         Username = reader.GetString(0),
                         Email = reader.GetString(1),
-                        Password = reader.GetString(2),
-                        DisplayName = Utils.ConvertFromDBVal<string>(reader.GetValue(3)),
-                        Avatar = Utils.ConvertFromDBVal<string>(reader.GetValue(4)),
-                        About = Utils.ConvertFromDBVal<string>(reader.GetValue(5))
+                        HashedPassword = reader.GetString(2),
+                        FirstName = Utils.ConvertFromDBVal<string>(reader.GetValue(3)),
+                        LastName = Utils.ConvertFromDBVal<string>(reader.GetValue(4))
                     };
 
                     connection.Close();
@@ -95,12 +101,10 @@ namespace Topics.Repository.DBOperations
                 }
                 catch (Exception ex)
                 {
-                    Debug.Write(ex.Message);
-                    return null;   
+                    return null;
                 }
             }
         }
-    
         public static bool ValidateUser(string username, string password, string connectionString)
         {
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
@@ -110,6 +114,7 @@ namespace Topics.Repository.DBOperations
             {
                 try
                 {
+                    connection.ConnectionString = connectionString;
                     SqlCommand selectUser = new SqlCommand()
                     {
                         Connection = connection,
@@ -119,10 +124,14 @@ namespace Topics.Repository.DBOperations
                             "WHERE username = @username ;"
                     };
 
+                    selectUser.Parameters.AddWithValue("username", username);
+
+                    connection.Open();
                     SqlDataReader reader = selectUser.ExecuteReader();
                     reader.Read();
 
                     string hashedPassword = Utils.ConvertFromDBVal<string>(reader.GetValue(0));
+                    connection.Close();
 
                     if (hashedPassword == null)
                         return false;
@@ -138,5 +147,6 @@ namespace Topics.Repository.DBOperations
             }
 
         }
+    
     }
 }

@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Web;
 using System.Web.Security;
+using Topics.Repository.Models.Account;
+using Topics.Repository.Models.DB;
+using Topics.Services.Implementations;
 using Topics.Services.Interfaces;
 
 namespace Topics.Authentication
@@ -11,32 +15,54 @@ namespace Topics.Authentication
     {
         private IUserService userService;
 
-        public CustomMembershipProvider(IUserService userService)
+        public CustomMembershipProvider() 
         {
-            this.userService = userService;
+            this.userService = new UserService();
         }
 
         public override bool ValidateUser(string username, string password)
         {
+            Debug.WriteLine("Validating user " + username);
             return userService.ValidateUser(username, password);
         }
 
         public override MembershipUser GetUser(string username, bool userIsOnline)
         {
-            MembershipUser user = userService.GetUser(username);
-
-            return user;
+            UserModel user = userService.GetUser(username);
+            if (user == null)
+                return null;
+            return new CustomMembershipUser(user);
         }
 
         public override string GetUserNameByEmail(string email)
         {
-            return userService.GetUserNameByEmail(email);
+            //return userService.GetUserNameByEmail(email);
+            return null;
         }
 
 
         public override MembershipUser CreateUser(string username, string password, string email, string passwordQuestion, string passwordAnswer, bool isApproved, object providerUserKey, out MembershipCreateStatus status)
         {
-             throw new NotImplementedException();
+            bool created = userService.CreateUser(new SignUpViewModel() 
+            { 
+                Username = username,
+                Password = password,
+                Email = email
+            });
+
+            if (created)
+                status = MembershipCreateStatus.Success;
+            else
+                status = MembershipCreateStatus.UserRejected;
+
+            MembershipUser user = new CustomMembershipUser(new UserModel() 
+            { 
+                Username = username,
+                HashedPassword = password,
+                Email = email
+            });
+            status = MembershipCreateStatus.Success;
+            return user;
         }
 
         public override MembershipUser GetUser(object providerUserKey, bool userIsOnline)

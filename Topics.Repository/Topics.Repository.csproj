@@ -45,8 +45,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DBOperations\UserOperations.cs" />
+    <Compile Include="Models\Account\SignInViewModel.cs" />
+    <Compile Include="Models\Account\SignUpViewModel.cs" />
+    <Compile Include="Models\DB\RoleModel.cs" />
     <Compile Include="Models\DB\UserModel.cs" />
-    <Compile Include="Models\DB\Error.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils.cs" />
   </ItemGroup>
