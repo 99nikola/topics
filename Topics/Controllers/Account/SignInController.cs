@@ -47,9 +47,9 @@ namespace Topics.Controllers
                 CustomSerializeModel userModel = new CustomSerializeModel()
                 {
                     Username = user.Username,
-                    /*FirstName = user.FirstName,
+                    FirstName = user.FirstName,
                     LastName = user.LastName,
-                    RoleName = user.Roles.Select(role => role.Name).ToList()*/
+                    //RoleName = user.Roles.Select(role => role.Name).ToList()
                 };
 
                 string userData = JsonConvert.SerializeObject(userModel);
