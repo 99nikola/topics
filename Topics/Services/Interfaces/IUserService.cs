@@ -14,5 +14,6 @@ namespace Topics.Services.Interfaces
         bool ValidateUser(string username, string password);
         UserModel GetUser(string username, string password);
         UserModel GetUser(string username);
+        string GetUsernameByEmail(string email);
     }
 }

@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web.Helpers;
 using Topics.Repository.Models.Account;
 using Topics.Repository.Models.DB;
@@ -15,6 +11,10 @@ namespace Topics.Repository.DBOperations
     {
         public static bool CreateUser(SignUpViewModel user, string connectionString)
         {
+            if (!user.IsValid())
+                return false;
+
+            Debug.WriteLine(user.FirstName + " " + user.LastName);
             using (SqlConnection connection = new SqlConnection())
             {
                 try
@@ -29,12 +29,15 @@ namespace Topics.Repository.DBOperations
                         Connection = connection,
 
                         CommandText =
-                        "INSERT INTO AppUser (username, email, password) " +
-                        "VALUES (@username, @email, @password); "
+                        "INSERT INTO tUser (username, email, password, firstName, lastName) " +
+                        "VALUES (@username, @email, @password, @firstName, @lastName); "
                     };
                     insert.Parameters.AddWithValue("username", user.Username);
                     insert.Parameters.AddWithValue("email", user.Email);
                     insert.Parameters.AddWithValue("password", hashedPassword);
+                    insert.Parameters.AddWithValue("firstName", user.FirstName);
+                    insert.Parameters.AddWithValue("lastName", user.LastName);
+                   
 
                     int rowsAffected = insert.ExecuteNonQuery();
 
@@ -76,7 +79,7 @@ namespace Topics.Repository.DBOperations
                         Connection = connection,
                         CommandText =
                             "SELECT * " +
-                            "FROM AppUser " +
+                            "FROM tUser " +
                             "WHERE username = @username ;"
                     };
 
@@ -101,10 +104,12 @@ namespace Topics.Repository.DBOperations
                 }
                 catch (Exception ex)
                 {
+                    Debug.WriteLine(ex.Message);
                     return null;
                 }
             }
         }
+       
         public static bool ValidateUser(string username, string password, string connectionString)
         {
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
@@ -120,7 +125,7 @@ namespace Topics.Repository.DBOperations
                         Connection = connection,
                         CommandText =
                             "SELECT password " +
-                            "FROM AppUser " +
+                            "FROM tUser " +
                             "WHERE username = @username ;"
                     };
 
@@ -148,5 +153,40 @@ namespace Topics.Repository.DBOperations
 
         }
     
+        public static string GetUsernameByEmail(string email, string connectionString)
+        {
+            try
+            {
+
+            using (SqlConnection connection = new SqlConnection())
+            {
+                connection.ConnectionString = connectionString;
+                connection.Open();
+
+                SqlCommand selectUsername = new SqlCommand()
+                {
+                    Connection = connection,
+                    CommandText =
+                        "SELECT username " +
+                        "FROM tUser " +
+                        "WHERE email = @email ;"
+                };
+                selectUsername.Parameters.AddWithValue("email", email);
+                SqlDataReader reader = selectUsername.ExecuteReader();
+                reader.Read();
+
+                string username = reader.GetString(0);
+
+                connection.Close();
+
+                return username;
+            }
+            } catch(Exception ex)
+            {
+                Debug.Write(ex.Message);
+                return null;
+            }
+        }
+
     }
 }

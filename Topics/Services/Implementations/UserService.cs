@@ -41,5 +41,10 @@ namespace Topics.Services.Implementations
             return UserOperations.GetUser(username, ConnectionString);
         }
 
+        public string GetUsernameByEmail(string email)
+        {
+            return UserOperations.GetUsernameByEmail(email, ConnectionString);
+        }
+
     }
 }

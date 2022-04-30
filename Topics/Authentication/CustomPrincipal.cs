@@ -8,7 +8,7 @@ namespace Topics.Authentication
 {
     public class CustomPrincipal : IPrincipal
     {
-        public int UserId { get; set; }
+        public int Username { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }

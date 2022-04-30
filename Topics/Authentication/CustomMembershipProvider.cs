@@ -36,8 +36,7 @@ namespace Topics.Authentication
 
         public override string GetUserNameByEmail(string email)
         {
-            //return userService.GetUserNameByEmail(email);
-            return null;
+            return userService.GetUsernameByEmail(email);
         }
 
 

@@ -215,7 +215,7 @@
     <Content Include="Scripts\umd\popper.js" />
     <Content Include="Scripts\umd\popper.min.js" />
     <Content Include="Web.config" />
-    <Content Include="Views\Account\SignUp.cshtml" />
+    <Content Include="Views\SignUp\Index.cshtml" />
     <Content Include="Views\Error\AccessDenied.cshtml" />
   </ItemGroup>
   <ItemGroup>
@@ -229,9 +229,11 @@
     <Compile Include="Authentication\CustomRoleProvider.cs" />
     <Compile Include="Authentication\CustomSerializeModel.cs" />
     <Compile Include="Constants\Routes.cs" />
-    <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\Account\SignInController.cs" />
+    <Compile Include="Controllers\Account\SignOutController.cs" />
+    <Compile Include="Controllers\Account\SignUpController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -282,7 +284,7 @@
     <Content Include="Scripts\esm\popper-utils.js.map" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Shared\Layouts\_BasicLayout.cshtml" />
-    <Content Include="Views\Account\SignIn.cshtml" />
+    <Content Include="Views\SignIn\Index.cshtml" />
     <Content Include="Scripts\jquery-3.6.0.slim.min.map" />
     <Content Include="Scripts\jquery-3.6.0.min.map" />
     <None Include="Web.Debug.config">
@@ -295,6 +297,7 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Models\" />
+    <Folder Include="Views\SignOut\" />
     <Folder Include="Views\User\" />
   </ItemGroup>
   <ItemGroup>

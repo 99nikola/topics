@@ -13,6 +13,15 @@ namespace Topics.Repository.Models.Account
         public string Email { get; set; }
         public string Password { get; set; }
         public string ConfirmPassword { get; set; }
-        public Guid ActivationCode { get; set; }
+
+        public bool IsValid()
+        {
+            if (string.IsNullOrEmpty(Username) || string.IsNullOrEmpty(FirstName) ||
+                string.IsNullOrEmpty(LastName) || string.IsNullOrEmpty(Password) ||
+                string.IsNullOrEmpty(Email) || string.IsNullOrEmpty(ConfirmPassword))
+                return false;
+
+            return true;
+        }
     }
 }
