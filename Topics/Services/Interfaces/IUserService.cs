@@ -15,5 +15,7 @@ namespace Topics.Services.Interfaces
         UserModel GetUser(string username, string password);
         UserModel GetUser(string username);
         string GetUsernameByEmail(string email);
+        string[] GetUserRoles(string username);
+
     }
 }

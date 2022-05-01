@@ -28,8 +28,7 @@ namespace Topics.Authentication
             if (!HttpContext.Current.User.Identity.IsAuthenticated)
                 return null;
 
-
-            return userService;
+            return userService.GetUserRoles(username);
         }
 
         public override string ApplicationName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }

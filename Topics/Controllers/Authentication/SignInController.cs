@@ -49,7 +49,7 @@ namespace Topics.Controllers
                     Username = user.Username,
                     FirstName = user.FirstName,
                     LastName = user.LastName,
-                    //RoleName = user.Roles.Select(role => role.Name).ToList()
+                    Roles = user.Roles.Select(role => role.Name).ToList()
                 };
 
                 string userData = JsonConvert.SerializeObject(userModel);

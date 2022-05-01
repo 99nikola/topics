@@ -229,11 +229,11 @@
     <Compile Include="Authentication\CustomRoleProvider.cs" />
     <Compile Include="Authentication\CustomSerializeModel.cs" />
     <Compile Include="Constants\Routes.cs" />
-    <Compile Include="Controllers\Account\ErrorController.cs" />
+    <Compile Include="Controllers\Auth\ErrorController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Controllers\Account\SignInController.cs" />
-    <Compile Include="Controllers\Account\SignOutController.cs" />
-    <Compile Include="Controllers\Account\SignUpController.cs" />
+    <Compile Include="Controllers\Auth\SignInController.cs" />
+    <Compile Include="Controllers\Auth\SignOutController.cs" />
+    <Compile Include="Controllers\Auth\SignUpController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>

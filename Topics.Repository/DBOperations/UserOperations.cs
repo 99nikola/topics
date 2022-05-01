@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Web.Helpers;
@@ -28,9 +29,10 @@ namespace Topics.Repository.DBOperations
                     {
                         Connection = connection,
 
-                        CommandText =
-                        "INSERT INTO tUser (username, email, password, firstName, lastName) " +
-                        "VALUES (@username, @email, @password, @firstName, @lastName); "
+                        CommandText = @"
+                            INSERT INTO tUser (username, email, password, firstName, lastName)
+                            VALUES (@username, @email, @password, @firstName, @lastName) 
+                            ;"
                     };
                     insert.Parameters.AddWithValue("username", user.Username);
                     insert.Parameters.AddWithValue("email", user.Email);
@@ -40,6 +42,20 @@ namespace Topics.Repository.DBOperations
                    
 
                     int rowsAffected = insert.ExecuteNonQuery();
+
+
+                    if (rowsAffected == 0)
+                    {
+                        connection.Close();
+                        return false;
+                    }
+
+                    insert.CommandText =
+                        "INSERT INTO " +
+                        "User_Role (username) " +
+                        "VALUES (@username) ;";
+
+                    rowsAffected = insert.ExecuteNonQuery();
 
                     connection.Close();
 
@@ -77,10 +93,13 @@ namespace Topics.Repository.DBOperations
                     SqlCommand selectUser = new SqlCommand()
                     {
                         Connection = connection,
-                        CommandText =
-                            "SELECT * " +
-                            "FROM tUser " +
-                            "WHERE username = @username ;"
+                        CommandText = @"
+                            SELECT *
+                            FROM tUser AS u
+	                        JOIN User_Role AS ur
+	                        ON u.username = ur.username
+	                        WHERE u.username = @username
+                            ;"
                     };
 
                     selectUser.Parameters.AddWithValue("username", username);
@@ -95,7 +114,10 @@ namespace Topics.Repository.DBOperations
                         Email = reader.GetString(1),
                         HashedPassword = reader.GetString(2),
                         FirstName = Utils.ConvertFromDBVal<string>(reader.GetValue(3)),
-                        LastName = Utils.ConvertFromDBVal<string>(reader.GetValue(4))
+                        LastName = Utils.ConvertFromDBVal<string>(reader.GetValue(4)),
+                        Avatar = Utils.ConvertFromDBVal<string>(reader.GetValue(5)),
+                        About = Utils.ConvertFromDBVal<string>(reader.GetValue(6)),
+                        Roles = new HashSet<RoleModel>() { new RoleModel() { Name = reader.GetString(8) } }
                     };
 
                     connection.Close();
@@ -123,10 +145,11 @@ namespace Topics.Repository.DBOperations
                     SqlCommand selectUser = new SqlCommand()
                     {
                         Connection = connection,
-                        CommandText =
-                            "SELECT password " +
-                            "FROM tUser " +
-                            "WHERE username = @username ;"
+                        CommandText = @"
+                            SELECT password
+                            FROM tUser
+                            WHERE username = @username 
+                            ;"
                     };
 
                     selectUser.Parameters.AddWithValue("username", username);
@@ -166,10 +189,11 @@ namespace Topics.Repository.DBOperations
                 SqlCommand selectUsername = new SqlCommand()
                 {
                     Connection = connection,
-                    CommandText =
-                        "SELECT username " +
-                        "FROM tUser " +
-                        "WHERE email = @email ;"
+                    CommandText = @"
+                        SELECT username
+                        FROM tUser
+                        WHERE email = @email 
+                        ;"
                 };
                 selectUsername.Parameters.AddWithValue("email", email);
                 SqlDataReader reader = selectUsername.ExecuteReader();
@@ -185,6 +209,46 @@ namespace Topics.Repository.DBOperations
             {
                 Debug.Write(ex.Message);
                 return null;
+            }
+        }
+
+        public static string[] GetUserRoles(string username, string connectionString)
+        {
+            using (SqlConnection connection = new SqlConnection())
+            {
+                try
+                {
+                    connection.ConnectionString = connectionString;
+                    connection.Open();
+
+                    SqlCommand selectUserRoles = new SqlCommand()
+                    {
+                        Connection = connection,
+                        CommandText = @"
+                            SELECT roleName
+                            FROM User_Role
+                            WHERE username = @username;
+                            ;"
+                    };
+                    selectUserRoles.Parameters.AddWithValue("username", username);
+
+                    SqlDataReader reader = selectUserRoles.ExecuteReader();
+
+                    List<string> roles = new List<string>();
+                    
+                    while (reader.Read())
+                    {
+                        roles.Add(reader.GetString(0));
+                    }
+
+                    connection.Close();
+                    return roles.ToArray();
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                    return null;
+                }
             }
         }
 

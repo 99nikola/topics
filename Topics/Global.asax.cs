@@ -28,10 +28,10 @@ namespace Topics
 
             var serializeModel = JsonConvert.DeserializeObject<CustomSerializeModel>(authTicket.UserData);
             CustomPrincipal principal = new CustomPrincipal(authTicket.Name);
-            //principal.UserId= serializeModel.UserID;
+            principal.Username = serializeModel.Username;
             principal.FirstName = serializeModel.FirstName;
             principal.LastName = serializeModel.LastName;
-            principal.Roles = serializeModel.RoleName;
+            principal.Roles = serializeModel.Roles.ToArray();
 
             HttpContext.Current.User = principal;
         }

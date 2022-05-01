@@ -46,5 +46,9 @@ namespace Topics.Services.Implementations
             return UserOperations.GetUsernameByEmail(email, ConnectionString);
         }
 
+        public string[] GetUserRoles(string username)
+        {
+            return UserOperations.GetUserRoles(username, ConnectionString);
+        }
     }
 }

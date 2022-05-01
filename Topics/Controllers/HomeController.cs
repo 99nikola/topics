@@ -9,7 +9,7 @@ namespace Topics.Controllers
 {
     public class HomeController : Controller
     {
-        [CustomAuthorize]
+        [CustomAuthorize(Roles = "basic")]
         public ActionResult Index()
         {
             return View();

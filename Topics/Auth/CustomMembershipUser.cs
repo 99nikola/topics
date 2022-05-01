@@ -14,7 +14,7 @@ namespace Topics.Authentication
         public string LastName { get; set; }
         public ICollection<RoleModel> Roles { get; set; }
 
-        public CustomMembershipUser(UserModel user) : base("CustomMembershipProvider", user.Username, user.Id, user.Email, string.Empty, string.Empty, true, false, DateTime.Now, DateTime.Now, DateTime.Now, DateTime.Now, DateTime.Now)
+        public CustomMembershipUser(UserModel user) : base("CustomMembershipProvider", user.Username, user.Username, user.Email, string.Empty, string.Empty, true, false, DateTime.Now, DateTime.Now, DateTime.Now, DateTime.Now, DateTime.Now)
         {
             Username = user.Username; 
             FirstName = user.FirstName;

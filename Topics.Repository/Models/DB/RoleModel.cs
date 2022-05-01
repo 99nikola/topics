@@ -8,8 +8,18 @@ namespace Topics.Repository.Models.DB
 {
     public class RoleModel
     {
-        public int Id { get; set; }
         public string Name { get; set; }
         public virtual ICollection<UserModel> Users { get; set; }
+
+        public override bool Equals(object obj)
+        {
+            return obj is RoleModel model &&
+                   Name == model.Name;
+        }
+
+        public override int GetHashCode()
+        {
+            return 539060726 + EqualityComparer<string>.Default.GetHashCode(Name);
+        }
     }
 }
