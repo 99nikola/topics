@@ -10,5 +10,6 @@ namespace Topics.Constants
         public const string HOME = "/";
         public const string SIGN_UP = "/signup";
         public const string SIGN_IN = "/signin";
+        public const string SIGN_OUT = "/signout";
     }
 }

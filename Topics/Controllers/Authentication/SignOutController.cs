@@ -22,7 +22,7 @@ namespace Topics.Controllers
             cookie.Expires = DateTime.Now.AddYears(-1);
             Response.Cookies.Add(cookie);
             FormsAuthentication.SignOut();
-            return RedirectToAction("SignIn", "Account", null);
+            return Redirect("/signin");
         }
     }
 }
