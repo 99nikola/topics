@@ -22,7 +22,7 @@ namespace Topics.Authentication
 
         public bool IsInRole(string role)
         {
-            return Roles.Any(r => r.Contains(role));
+            return Roles.Any(r => role.Contains(r));
         }
 
         public CustomPrincipal(string username)

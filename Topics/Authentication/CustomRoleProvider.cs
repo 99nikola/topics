@@ -25,11 +25,11 @@ namespace Topics.Authentication
 
         public override string[] GetRolesForUser(string username)
         {
-            if (!HttpContext.Current.User.Identity.IsAuthenticated) return null;
+            if (!HttpContext.Current.User.Identity.IsAuthenticated)
+                return null;
 
-            //string[] userRoles = userService.GetUserRoles(username);
 
-            return null;
+            return userService;
         }
 
         public override string ApplicationName { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }

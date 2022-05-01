@@ -21,16 +21,15 @@ namespace Topics.Authentication
 
         protected override void HandleUnauthorizedRequest(AuthorizationContext filterContext)
         {
-            RedirectToRouteResult routeData = null;
-
+            RedirectToRouteResult routeData;
             if (CurrentUser == null)
             {
                 routeData = new RedirectToRouteResult
                     (new System.Web.Routing.RouteValueDictionary
                     (new
                     {
-                        controller = "Account",
-                        action = "Login",
+                        controller = "SignIn",
+                        action = "Index",
                     }
                     ));
             }

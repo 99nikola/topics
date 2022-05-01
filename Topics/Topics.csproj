@@ -229,7 +229,7 @@
     <Compile Include="Authentication\CustomRoleProvider.cs" />
     <Compile Include="Authentication\CustomSerializeModel.cs" />
     <Compile Include="Constants\Routes.cs" />
-    <Compile Include="Controllers\ErrorController.cs" />
+    <Compile Include="Controllers\Account\ErrorController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\Account\SignInController.cs" />
     <Compile Include="Controllers\Account\SignOutController.cs" />
