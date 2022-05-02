@@ -29,8 +29,6 @@ namespace Topics.Controllers
         [HttpPost]
         public ActionResult Index(SignUpViewModel signUp)
         {
-            ViewBag.Status = false;
-
             if (!ModelState.IsValid || !signUp.IsValid())
             {
                 ViewBag.Message = "Something went wrong!";
@@ -58,17 +56,28 @@ namespace Topics.Controllers
             }
 
             bool created = userService.CreateUser(signUp);
-            if (created)
-            {
-                ViewBag.Message = "Your account has been created successfully :D";
-                ViewBag.Status = true;
-            }
-            else
+            if (!created)
             {
                 ViewBag.Message = "Something went wrong, try again.";
+                return View(signUp);
             }
 
-            return View(signUp);
+            user = (CustomMembershipUser)Membership.GetUser(signUp.Username, false);
+
+            if (user != null)
+            {
+                HttpCookie authCookie = userService.GetAuthCookie(user);
+                Response.Cookies.Add(authCookie);
+            }
+
+            return Redirect("/");
         }
+        
+        /*[HttpGet]
+        [CustomAuthorize]
+        public ActionResult SetupProfile()
+        {
+
+        }*/
     }
 }

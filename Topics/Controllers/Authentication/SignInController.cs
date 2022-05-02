@@ -44,22 +44,8 @@ namespace Topics.Controllers
 
             if (user != null)
             {
-                CustomSerializeModel userModel = new CustomSerializeModel()
-                {
-                    Username = user.Username,
-                    FirstName = user.FirstName,
-                    LastName = user.LastName,
-                    Roles = user.Roles.Select(role => role.Name).ToList()
-                };
-
-                string userData = JsonConvert.SerializeObject(userModel);
-                FormsAuthenticationTicket authTicket = new FormsAuthenticationTicket(
-                    1, signIn.Username, DateTime.Now, DateTime.Now.AddMinutes(15), false, userData
-                );
-
-                string enTicket = FormsAuthentication.Encrypt(authTicket);
-                HttpCookie faCookie = new HttpCookie("auth", enTicket);
-                Response.Cookies.Add(faCookie);
+                HttpCookie authCookie = userService.GetAuthCookie(user);
+                Response.Cookies.Add(authCookie);
             }
 
             if (Url.IsLocalUrl(returnUrl)) return Redirect(returnUrl);
