@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using System.Web.Security;
 using Topics.Authentication;
 using Topics.Repository.Models.Account;
+using Topics.Repository.Models.DB;
 using Topics.Services.Interfaces;
 
 namespace Topics.Controllers
@@ -41,31 +42,29 @@ namespace Topics.Controllers
                 return View(signUp);
             }
 
-            var user = (CustomMembershipUser)Membership.GetUser(signUp.Username, false);
-            if (user != null)
+
+            if (userService.GetUser(signUp.Username).Success)
             {
                 ModelState.AddModelError("Username", "Username already exists");
                 return View(signUp);
             }
 
-            string username = Membership.GetUserNameByEmail(signUp.Email);
-            if (username != null)
+            if (userService.GetUsernameByEmail(signUp.Email).Success)
             {
                 ModelState.AddModelError("Email", "Email already in use");
                 return View(signUp);
             }
 
-            bool created = userService.CreateUser(signUp);
-            if (!created)
+            var createUserRes = userService.CreateUser(signUp);
+            if (!createUserRes.Success)
             {
-                ViewBag.Message = "Something went wrong, try again.";
+                ViewBag.Message = createUserRes.Message;
                 return View(signUp);
             }
-
-            user = (CustomMembershipUser)Membership.GetUser(signUp.Username, false);
-
-            if (user != null)
-            {
+            var getUserRes = userService.GetUser(signUp.Username);
+            if (getUserRes.Success)
+            {   
+                var user = ((DBValue<UserModel>)getUserRes).Value;
                 HttpCookie authCookie = userService.GetAuthCookie(user);
                 Response.Cookies.Add(authCookie);
             }

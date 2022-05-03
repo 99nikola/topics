@@ -47,6 +47,8 @@
     <Compile Include="DBOperations\UserOperations.cs" />
     <Compile Include="Models\Account\SignInViewModel.cs" />
     <Compile Include="Models\Account\SignUpViewModel.cs" />
+    <Compile Include="Models\DB\DBValue.cs" />
+    <Compile Include="Models\DB\DBResponse.cs" />
     <Compile Include="Models\DB\RoleModel.cs" />
     <Compile Include="Models\DB\UserModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

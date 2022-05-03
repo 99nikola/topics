@@ -7,6 +7,7 @@ using System.Web.Mvc;
 using System.Web.Security;
 using Topics.Authentication;
 using Topics.Repository.Models.Account;
+using Topics.Repository.Models.DB;
 using Topics.Services.Interfaces;
 
 namespace Topics.Controllers
@@ -34,17 +35,16 @@ namespace Topics.Controllers
         [HttpPost]
         public ActionResult Index(SignInViewModel signIn, string returnUrl = "")
         {
-            if (!ModelState.IsValid || !Membership.ValidateUser(signIn.Username, signIn.Password))
+            if (!ModelState.IsValid || userService.ValidateUser(signIn.Username, signIn.Password).Success)
             {
                 ModelState.AddModelError("", "Something went wrong : Username or Password invalid ^_^");
                 return View(signIn);
             }
 
-            var user = (CustomMembershipUser)Membership.GetUser(signIn.Username, false);
-
-            if (user != null)
+            var getUserRes = userService.GetUser(signIn.Username);
+            if (getUserRes.Success)
             {
-                HttpCookie authCookie = userService.GetAuthCookie(user);
+                HttpCookie authCookie = userService.GetAuthCookie(((DBValue<UserModel>)getUserRes).Value);
                 Response.Cookies.Add(authCookie);
             }
 

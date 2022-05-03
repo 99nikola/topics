@@ -2,16 +2,17 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Principal;
 using System.Web;
 using System.Web.Mvc;
 
 namespace Topics.Authentication
 {
-    public class CustomAuthorizeAttribute : AuthorizeAttribute
+    public class Authorize : AuthorizeAttribute
     {
-        protected virtual CustomPrincipal CurrentUser
+        protected virtual IPrincipal CurrentUser
         {
-            get { return HttpContext.Current.User as CustomPrincipal; }
+            get { return HttpContext.Current.User as Principal; }
         }
 
         protected override bool AuthorizeCore(HttpContextBase httpContext)

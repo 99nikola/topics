@@ -27,12 +27,12 @@ CREATE TABLE User_Role (
 	roleName VARCHAR(32) DEFAULT 'basic',
 	PRIMARY KEY(username, roleName),
 
-	CONSTRAINT fk_username
+	CONSTRAINT FK_UserRole_username
 		FOREIGN KEY (username)
 		REFERENCES tUser(username)
-		ON DELETE CASCADE
-		ON UPDATE CASCADE,
-	CONSTRAINT fk_rolename
+		ON DELETE NO ACTION
+		ON UPDATE NO ACTION,
+	CONSTRAINT FK_UserRole_roleName
 		FOREIGN KEY (roleName)
 		REFERENCES Role(name)
 		ON DELETE CASCADE
@@ -44,108 +44,34 @@ CREATE TABLE Follow (
 	following VARCHAR(64),
 	PRIMARY KEY (follower, following),
 
-	CONSTRAINT FK_F_follower 
+	CONSTRAINT FK_Follow_follower 
 	FOREIGN KEY (follower)
 	REFERENCES tUser(username)
 	ON DELETE NO ACTION
 	ON UPDATE NO ACTION,
 
-	CONSTRAINT FK_F_following
+	CONSTRAINT FK_Follow_following
 	FOREIGN KEY (following)
 	REFERENCES tUser(username)
 	ON DELETE NO ACTION
 	ON UPDATE NO ACTION
+
 	-- Manualy CASCADE (ON DELETE and ON UPDATE)
 );
 
-
-CREATE TRIGGER Trigger_User_Update
-ON tUser
-INSTEAD OF UPDATE
-AS
-	SET NOCOUNT ON
-	IF UPDATE(username)
-	BEGIN
-
-		DECLARE @update VARCHAR(64), @current VARCHAR(64)
-
-		SELECT @update = username
-		FROM inserted;
-
-		SELECT @current = u.username
-		FROM tUser u
-		INNER JOIN Inserted i
-			ON i.id = u.id;
-
-		INSERT INTO 
-		tUser (username, password, email, firstName, lastName, avatar, about)
-		SELECT @update, password, email, firstName, lastName, avatar, about
-		FROM tUser
-		WHERE username = @current
-
-		UPDATE Follow
-		SET following  = @update
-		WHERE following = @current
-
-		UPDATE Follow
-		SET follower = @update
-		WHERE follower = @current
-
-		UPDATE Comment
-		SET ownerUsername = @update
-		WHERE ownerUsername = @current
-
-		DELETE FROM tUser
-		WHERE username = @current
-	END
-	ELSE
-	BEGIN
-		UPDATE tUser 
-		SET password = i.password, 
-			email = i.email, 
-			firstName = i.firstName, 
-			lastName = i.lastName, 
-			avatar = i.avatar, 
-			about = i.about
-		FROM tUser u
-			INNER JOIN inserted i
-			ON i.username = u.username
-	END
-;
-
-	
-CREATE TRIGGER Trigger_User_Delete
-ON tUser
-INSTEAD OF DELETE
-AS
-	SET NOCOUNT ON
-	DECLARE @username VARCHAR(64)
-
-	SELECT @username = username
-	FROM deleted;
-
-	DELETE FROM Follow
-	WHERE follower = @username OR following = @username;
-
-	DELETE FROM Comment
-	WHERE ownerUsername = @username
-
-    DELETE FROM tUser WHERE username IN (SELECT username FROM deleted)
-;
-
-
 CREATE TABLE Topic (
+	id INT NOT NULL IDENTITY(1,1),
 	name VARCHAR(64) PRIMARY KEY,
 	title VARCHAR(256),
 	description TEXT,
 	cover VARCHAR(256),
 	owner VARCHAR(64) NOT NULL,
 
-	CONSTRAINT fk_owner
+	CONSTRAINT FK_Topic_owner
 		FOREIGN KEY (owner)
 		REFERENCES tUser(username) 
-		ON DELETE CASCADE
-		ON UPDATE CASCADE
+		ON DELETE NO ACTION
+		ON UPDATE NO ACTION
 );
 
 CREATE TABLE Topic_Moderator (
@@ -153,46 +79,64 @@ CREATE TABLE Topic_Moderator (
 	moderatorName VARCHAR(64),
 	PRIMARY KEY (topicName, moderatorName),
 
-	CONSTRAINT fk_moderatorName
+	CONSTRAINT FK_TopicModerator_moderatorName
 	FOREIGN KEY (moderatorName)
 	REFERENCES tUser(username)
-	ON DELETE CASCADE
-	ON UPDATE CASCADE,
+	ON DELETE NO ACTION
+	ON UPDATE NO ACTION,
+	-- Manulay CASCADE
 
-	CONSTRAINT fk_topicName
+	CONSTRAINT FK_TopicModerator_topicName
 	FOREIGN KEY (topicName)
 	REFERENCES Topic(name)
-	ON DELETE NO ACTION
-	ON UPDATE NO ACTION
-	-- Manulay CASCADE
-);
-
+	ON DELETE CASCADE
+	ON UPDATE CASCADE
+)
 
 CREATE TABLE Topic_Member (
-	topicName VARCHAR(64) FOREIGN KEY REFERENCES Topic(name),
-	memberName VARCHAR(64) FOREIGN KEY REFERENCES tUser(username),
+	topicName VARCHAR(64),
+	memberName VARCHAR(64),
 	PRIMARY KEY (topicName, memberName),
 
-	CONSTRAINT fk_memberName
+	CONSTRAINT FK_TopicMember_memberName
 	FOREIGN KEY (memberName)
 	REFERENCES tUser(username)
-	ON DELETE CASCADE
-	ON UPDATE CASCADE,
-
-	CONSTRAINT fk_topicName
+	ON DELETE NO ACTION
+	ON UPDATE NO ACTION,
+	--Manualy CASCADE
+	
+	CONSTRAINT FK_TopicMember_topicName
 	FOREIGN KEY (topicName)
 	REFERENCES Topic(name)
-	--ON DELETE CASCADE
-	--ON UPDATE CASCADE
+	ON DELETE CASCADE
+	ON UPDATE CASCADE
 );
 
+
 CREATE TABLE Post (
+	id INT NOT NULL IDENTITY(1,1),
 	slug VARCHAR(256) PRIMARY KEY,
+	ownerUsername VARCHAR(64),
+	topicName VARCHAR(64),
 	title VARCHAR(256),
 	content VARBINARY(MAX),
 	upVotes INT DEFAULT 0,
 	downVotes INT DEFAULT 0,
-	dateCreated DATETIME DEFAULT GETDATE()
+	dateCreated DATETIME DEFAULT GETDATE(),
+
+	CONSTRAINT FK_Post_ownerUsername
+	FOREIGN KEY (ownerUsername)
+	REFERENCES tUser(username)
+	ON DELETE NO ACTION
+	ON UPDATE NO ACTION,
+	-- Manualy CASCADE
+
+	CONSTRAINT FK_Post_topicName
+	FOREIGN KEY (topicName)
+	REFERENCES Topic(name)
+	ON DELETE CASCADE
+	ON UPDATE CASCADE	
+	-- Manualy CASCADE
 );
 
 CREATE TABLE Comment (
@@ -202,53 +146,24 @@ CREATE TABLE Comment (
 	parent INT,
 	ownerUsername VARCHAR(64) NOT NULL,
 	postSlug VARCHAR(256),
+	topicName VARCHAR(64),
 
-	CONSTRAINT fk_parent
+	CONSTRAINT FK_Comment_parent
 	FOREIGN KEY (parent)
 	REFERENCES Comment(id)
 	ON DELETE NO ACTION 
 	ON UPDATE NO ACTION,
 	-- Manualy CASCADE
 
-	CONSTRAINT fk_ownerUsername
+	CONSTRAINT FK_Comment_ownerUsername
 	FOREIGN KEY (ownerUsername)
 	REFERENCES tUser(username)
 	ON DELETE NO ACTION 
 	ON UPDATE NO ACTION,
-	-- Manulay CASCADE
 
-	CONSTRAINT fk_postSlug
+	CONSTRAINT FK_Comment_postSlug
 	FOREIGN KEY (postSlug)
 	REFERENCES Post(slug) 
-	ON DELETE CASCADE 
-	ON UPDATE CASCADE
-);
-
-drop table Topic_Post_User
-
-
-CREATE TABLE Topic_Post_User (
-	topicName VARCHAR(64),
-	postSlug VARCHAR(256),
-	ownerUsername VARCHAR(64),
-	PRIMARY KEY (topicName, postSlug, ownerUsername),
-
-	CONSTRAINT FK_TPU_topicName
-	FOREIGN KEY (topicName)
-	REFERENCES Topic(name)
-	ON DELETE NO ACTION
-	ON UPDATE NO ACTION,
-	-- Manualy CASCADE
-
-	CONSTRAINT FK_TPU_postSlug
-	FOREIGN KEY (postSlug)
-	REFERENCES Post(slug) 
-	ON DELETE CASCADE 
-	ON UPDATE CASCADE,
-
-	CONSTRAINT FK_TPU_ownerUsername
-	FOREIGN KEY (ownerUsername)
-	REFERENCES tUser(username)
-	ON DELETE CASCADE 
+	ON DELETE CASCADE
 	ON UPDATE CASCADE
 );

@@ -6,6 +6,7 @@ using System.Web;
 using System.Web.Security;
 using Topics.Authentication;
 using Topics.Repository.DBOperations;
+using Topics.Repository.Models;
 using Topics.Repository.Models.Account;
 using Topics.Repository.Models.DB;
 using Topics.Services.Interfaces;
@@ -24,43 +25,42 @@ namespace Topics.Services.Implementations
                     ConnectionString;
         }
         
-        public bool CreateUser(SignUpViewModel user)
+        public DBResponse CreateUser(SignUpViewModel user)
         {
             return UserOperations.CreateUser(user, ConnectionString);
         }
 
-        public bool ValidateUser(string username, string password)
+        public DBResponse ValidateUser(string username, string password)
         {
             return UserOperations.ValidateUser(username, password, ConnectionString);
         }
 
-        public UserModel GetUser(string username, string password)
+        public DBResponse GetUser(string username, string password)
         {
             return UserOperations.GetUser(username, password, ConnectionString);
         }
 
-        public UserModel GetUser(string username)
+        public DBResponse GetUser(string username)
         {
             return UserOperations.GetUser(username, ConnectionString);
         }
 
-        public string GetUsernameByEmail(string email)
+        public DBResponse GetUsernameByEmail(string email)
         {
             return UserOperations.GetUsernameByEmail(email, ConnectionString);
         }
 
-        public string[] GetUserRoles(string username)
+        public DBResponse GetUserRoles(string username)
         {
             return UserOperations.GetUserRoles(username, ConnectionString);
         }
 
-        public HttpCookie GetAuthCookie(CustomMembershipUser user)
+        public HttpCookie GetAuthCookie(UserModel user)
         {
-            CustomSerializeModel userModel = new CustomSerializeModel()
+
+            SerializeModel userModel = new SerializeModel()
             {
                 Username = user.Username,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
                 Roles = user.Roles.Select(role => role.Name).ToList()
             };
 

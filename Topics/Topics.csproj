@@ -224,12 +224,9 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\UnityConfig.cs" />
     <Compile Include="App_Start\UnityMvcActivator.cs" />
-    <Compile Include="Auth\CustomAuthorizeAttribute.cs" />
-    <Compile Include="Auth\CustomMembershipProvider.cs" />
-    <Compile Include="Auth\CustomMembershipUser.cs" />
-    <Compile Include="Auth\CustomPrincipal.cs" />
-    <Compile Include="Auth\CustomRoleProvider.cs" />
-    <Compile Include="Auth\CustomSerializeModel.cs" />
+    <Compile Include="Auth\Authorize.cs" />
+    <Compile Include="Auth\Principal.cs" />
+    <Compile Include="Auth\SerializeModel.cs" />
     <Compile Include="Constants\Routes.cs" />
     <Compile Include="Controllers\Authentication\ErrorController.cs" />
     <Compile Include="Controllers\HomeController.cs" />

@@ -6,7 +6,7 @@ using System.Web;
 
 namespace Topics.Authentication
 {
-    public class CustomPrincipal : IPrincipal
+    public class Principal : IPrincipal
     {
         public string Username { get; set; }
         public string FirstName { get; set; }
@@ -25,7 +25,7 @@ namespace Topics.Authentication
             return Roles.Any(r => role.Contains(r));
         }
 
-        public CustomPrincipal(string username)
+        public Principal(string username)
         {
             Identity = new GenericIdentity(username);
         }

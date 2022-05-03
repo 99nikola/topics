@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Web.Helpers;
+using Topics.Repository.Models;
 using Topics.Repository.Models.Account;
 using Topics.Repository.Models.DB;
 
@@ -10,12 +11,12 @@ namespace Topics.Repository.DBOperations
 {
     public class UserOperations
     {
-        public static bool CreateUser(SignUpViewModel user, string connectionString)
+        public static DBResponse CreateUser(SignUpViewModel user, string connectionString)
         {
             if (!user.IsValid())
-                return false;
+                return new DBResponse() { Success = false, Message = "SignUpViewModel is invalid." };
 
-            Debug.WriteLine(user.FirstName + " " + user.LastName);
+            
             using (SqlConnection connection = new SqlConnection())
             {
                 try
@@ -43,11 +44,10 @@ namespace Topics.Repository.DBOperations
 
                     int rowsAffected = insert.ExecuteNonQuery();
 
-
                     if (rowsAffected == 0)
                     {
                         connection.Close();
-                        return false;
+                        return new DBResponse() { Success = false, Message = "0 rows affected, something went wrong." };
                     }
 
                     insert.CommandText =
@@ -59,29 +59,37 @@ namespace Topics.Repository.DBOperations
 
                     connection.Close();
 
-                    return rowsAffected == 1;
+                    if (rowsAffected == 1)
+                        return new DBResponse() { Success = true, Message = "User successfully inserted." };
+                    else
+                        return new DBResponse() { Success = false, Message = "0 rows affected, something went wrong." };
                 }
                 catch (SqlException ex)
                 {
-                    Debug.WriteLine(ex.Message);
-                    return false;
+                    return new DBResponse() { Success = false, Message = ex.Message };
                 }
             }
         }
 
-        public static UserModel GetUser(string username, string password, string connectionString)
+        public static DBResponse GetUser(string username, string password, string connectionString)
         {
-            UserModel user = GetUser(username, connectionString);
+            DBResponse response = GetUser(username, connectionString);
+            if (!response.Success)
+                return response;
+
+            UserModel user = ((DBValue<UserModel>)response).Value;
 
             bool verified = Crypto.VerifyHashedPassword(user.HashedPassword, password);
 
             if (!verified)
-                return null;
+            {
+                new DBResponse() { Success = false, Message = "Wrong password, try again." };
+            }
 
-            return user;
+            return response;
         }
     
-        public static UserModel GetUser(string username, string connectionString)
+        public static DBResponse GetUser(string username, string connectionString)
         {
             using (SqlConnection connection = new SqlConnection())
             {
@@ -110,32 +118,32 @@ namespace Topics.Repository.DBOperations
 
                     UserModel user = new UserModel()
                     {
-                        Username = reader.GetString(0),
-                        Email = reader.GetString(1),
-                        HashedPassword = reader.GetString(2),
-                        FirstName = Utils.ConvertFromDBVal<string>(reader.GetValue(3)),
-                        LastName = Utils.ConvertFromDBVal<string>(reader.GetValue(4)),
-                        Avatar = Utils.ConvertFromDBVal<string>(reader.GetValue(5)),
-                        About = Utils.ConvertFromDBVal<string>(reader.GetValue(6)),
-                        Roles = new HashSet<RoleModel>() { new RoleModel() { Name = reader.GetString(8) } }
+                        Username = reader.GetString(1),
+                        Email = reader.GetString(2),
+                        HashedPassword = reader.GetString(3),
+                        FirstName = Utils.ConvertFromDBVal<string>(reader.GetValue(4)),
+                        LastName = Utils.ConvertFromDBVal<string>(reader.GetValue(5)),
+                        Avatar = Utils.ConvertFromDBVal<string>(reader.GetValue(6)),
+                        About = Utils.ConvertFromDBVal<string>(reader.GetValue(7)),
+                        Roles = new HashSet<RoleModel>() { new RoleModel() { Name = reader.GetString(9) } }
                     };
 
                     connection.Close();
 
-                    return user;
+                    return new DBValue<UserModel>() { Value = user, Success = true };
                 }
                 catch (Exception ex)
                 {
                     Debug.WriteLine(ex.Message);
-                    return null;
+                    return new DBResponse() { Success = false, Message = ex.Message };
                 }
             }
         }
        
-        public static bool ValidateUser(string username, string password, string connectionString)
+        public static DBResponse ValidateUser(string username, string password, string connectionString)
         {
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
-                return false;
+                return new DBResponse() { Success = false, Message = "Invalid username or password." };
 
             using (SqlConnection connection = new SqlConnection())
             {
@@ -162,57 +170,55 @@ namespace Topics.Repository.DBOperations
                     connection.Close();
 
                     if (hashedPassword == null)
-                        return false;
+                        return new DBResponse() { Success = false, Message = "Wrong password, try again." };
 
                     bool isValid = Crypto.VerifyHashedPassword(hashedPassword, password);
 
-                    return isValid;
+                    return new DBValue<bool>() { Value = true };
                 } catch (Exception ex)
                 {
                     Debug.WriteLine(ex.Message);
-                    return false;
+                    return new DBResponse() { Success = false, Message = ex.Message };
                 }
             }
 
         }
     
-        public static string GetUsernameByEmail(string email, string connectionString)
+        public static DBResponse GetUsernameByEmail(string email, string connectionString)
         {
-            try
-            {
-
             using (SqlConnection connection = new SqlConnection())
             {
-                connection.ConnectionString = connectionString;
-                connection.Open();
-
-                SqlCommand selectUsername = new SqlCommand()
+                try
                 {
-                    Connection = connection,
-                    CommandText = @"
-                        SELECT username
-                        FROM tUser
-                        WHERE email = @email 
-                        ;"
-                };
-                selectUsername.Parameters.AddWithValue("email", email);
-                SqlDataReader reader = selectUsername.ExecuteReader();
-                reader.Read();
+                    connection.ConnectionString = connectionString;
+                    connection.Open();
 
-                string username = reader.GetString(0);
+                    SqlCommand selectUsername = new SqlCommand()
+                    {
+                        Connection = connection,
+                        CommandText = @"
+                            SELECT username
+                            FROM tUser
+                            WHERE email = @email 
+                            ;"
+                    };
+                    selectUsername.Parameters.AddWithValue("email", email);
+                    SqlDataReader reader = selectUsername.ExecuteReader();
+                    reader.Read();
 
-                connection.Close();
+                    string username = reader.GetString(0);
 
-                return username;
-            }
-            } catch(Exception ex)
-            {
-                Debug.Write(ex.Message);
-                return null;
+                    connection.Close();
+
+                    return new DBValue<string>() { Success = true, Value = username };
+                } catch(Exception ex)
+                {
+                    return new DBResponse() { Success = false, Message = ex.Message };
+                }
             }
         }
 
-        public static string[] GetUserRoles(string username, string connectionString)
+        public static DBResponse GetUserRoles(string username, string connectionString)
         {
             using (SqlConnection connection = new SqlConnection())
             {
@@ -242,12 +248,11 @@ namespace Topics.Repository.DBOperations
                     }
 
                     connection.Close();
-                    return roles.ToArray();
+                    return new DBValue<string[]>() { Success = true, Value = roles.ToArray() };
                 }
                 catch (Exception ex)
                 {
-                    Debug.WriteLine(ex.Message);
-                    return null;
+                    return new DBResponse() { Success = false, Message = ex.Message };
                 }
             }
         }

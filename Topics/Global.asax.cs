@@ -25,12 +25,12 @@ namespace Topics
                 return;
             
             FormsAuthenticationTicket authTicket = FormsAuthentication.Decrypt(authCookie.Value);
+            if (authTicket == null)
+                return;
 
-            var serializeModel = JsonConvert.DeserializeObject<CustomSerializeModel>(authTicket.UserData);
-            CustomPrincipal principal = new CustomPrincipal(authTicket.Name);
+            SerializeModel serializeModel = JsonConvert.DeserializeObject<SerializeModel>(authTicket.UserData);
+            Principal principal = new Principal(authTicket.Name);
             principal.Username = serializeModel.Username;
-            principal.FirstName = serializeModel.FirstName;
-            principal.LastName = serializeModel.LastName;
             principal.Roles = serializeModel.Roles.ToArray();
 
             HttpContext.Current.User = principal;

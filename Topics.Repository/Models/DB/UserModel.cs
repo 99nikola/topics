@@ -17,5 +17,6 @@ namespace Topics.Repository.Models.DB
         public string Avatar { get; set; }
         public bool IsActive { get; set; }
         public virtual ICollection<RoleModel> Roles { get; set; }
+        
     }
 }

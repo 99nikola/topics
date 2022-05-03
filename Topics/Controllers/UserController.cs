@@ -7,7 +7,7 @@ using Topics.Authentication;
 
 namespace Topics.Controllers
 {
-    [CustomAuthorize(Roles = "basic")]
+    [@Authorize(Roles = "nope")]
     public class UserController : Controller
     {
         public ActionResult Index()
