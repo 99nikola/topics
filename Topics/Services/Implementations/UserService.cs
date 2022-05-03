@@ -15,7 +15,6 @@ namespace Topics.Services.Implementations
 {
     public class UserService : IUserService
     {
-
         private string ConnectionString
         {
             get => System.
@@ -35,22 +34,22 @@ namespace Topics.Services.Implementations
             return UserOperations.ValidateUser(username, password, ConnectionString);
         }
 
-        public DBResponse GetUser(string username, string password)
+        public DBResponse<UserModel> GetUser(SignInViewModel signIn)
         {
-            return UserOperations.GetUser(username, password, ConnectionString);
+            return UserOperations.GetUser(signIn, ConnectionString);
         }
 
-        public DBResponse GetUser(string username)
+        public DBResponse<UserModel> GetUser(string username)
         {
             return UserOperations.GetUser(username, ConnectionString);
         }
 
-        public DBResponse GetUsernameByEmail(string email)
+        public DBResponse<string> GetUsernameByEmail(string email)
         {
             return UserOperations.GetUsernameByEmail(email, ConnectionString);
         }
 
-        public DBResponse GetUserRoles(string username)
+        public DBResponse<string[]> GetUserRoles(string username)
         {
             return UserOperations.GetUserRoles(username, ConnectionString);
         }
@@ -72,6 +71,16 @@ namespace Topics.Services.Implementations
             string enTicket = FormsAuthentication.Encrypt(authTicket);
             HttpCookie authCookie = new HttpCookie("auth", enTicket);
             return authCookie;
+        }
+
+        public DBResponse<string> DoesExist(string username, string email)
+        {
+            return UserOperations.DoesExist(username, email, ConnectionString);
+        }
+
+        public DBResponse<string> DoesExist(string username)
+        {
+            return UserOperations.DoesExist(username, ConnectionString);
         }
     }
 }

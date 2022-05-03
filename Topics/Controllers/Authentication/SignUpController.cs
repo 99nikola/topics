@@ -30,41 +30,32 @@ namespace Topics.Controllers
         [HttpPost]
         public ActionResult Index(SignUpViewModel signUp)
         {
-            if (!ModelState.IsValid || !signUp.IsValid())
+
+            var exist = userService.DoesExist(signUp.Username, signUp.Email);
+
+            if (exist.Value != null)
             {
-                ViewBag.Message = "Something went wrong!";
+                if (exist.Value.Equals("username"))
+                    ModelState.AddModelError("Username", exist.Message);
+                else
+                    ModelState.AddModelError("Email", exist.Message);
+
                 return View(signUp);
             }
 
-            if (!signUp.Password.Equals(signUp.ConfirmPassword))
+            var response = userService.CreateUser(signUp);
+
+            if (!response.Success)
             {
-                ModelState.AddModelError("ConfirmPassword", "Passwords don't match.");
+                ViewBag.Message = response.Message;
                 return View(signUp);
             }
 
-
-            if (userService.GetUser(signUp.Username).Success)
-            {
-                ModelState.AddModelError("Username", "Username already exists");
-                return View(signUp);
-            }
-
-            if (userService.GetUsernameByEmail(signUp.Email).Success)
-            {
-                ModelState.AddModelError("Email", "Email already in use");
-                return View(signUp);
-            }
-
-            var createUserRes = userService.CreateUser(signUp);
-            if (!createUserRes.Success)
-            {
-                ViewBag.Message = createUserRes.Message;
-                return View(signUp);
-            }
+           
             var getUserRes = userService.GetUser(signUp.Username);
             if (getUserRes.Success)
             {   
-                var user = ((DBValue<UserModel>)getUserRes).Value;
+                var user = getUserRes.Value;
                 HttpCookie authCookie = userService.GetAuthCookie(user);
                 Response.Cookies.Add(authCookie);
             }

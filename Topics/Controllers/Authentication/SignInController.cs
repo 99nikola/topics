@@ -25,8 +25,8 @@ namespace Topics.Controllers
         [HttpGet]
         public ActionResult Index(string returnUrl = "")
         {
-            /*if (User.Identity.IsAuthenticated)
-                return SignOut();*/
+            if (User.Identity.IsAuthenticated)
+                return RedirectToAction("Index", "SignOut");
 
             ViewBag.ReturnUrl = returnUrl;
             return View(new SignInViewModel());
@@ -35,18 +35,24 @@ namespace Topics.Controllers
         [HttpPost]
         public ActionResult Index(SignInViewModel signIn, string returnUrl = "")
         {
-            if (!ModelState.IsValid || userService.ValidateUser(signIn.Username, signIn.Password).Success)
+            var exist = userService.DoesExist(signIn.Username);
+            if (exist.Value == null)
             {
-                ModelState.AddModelError("", "Something went wrong : Username or Password invalid ^_^");
+                ModelState.AddModelError("Username", "Username doesn't exist.");
+                return View(signIn);
+            }
+                
+            var res = userService.GetUser(signIn);
+
+            if (!res.Success)
+            {
+                ModelState.AddModelError("", res.Message);
                 return View(signIn);
             }
 
-            var getUserRes = userService.GetUser(signIn.Username);
-            if (getUserRes.Success)
-            {
-                HttpCookie authCookie = userService.GetAuthCookie(((DBValue<UserModel>)getUserRes).Value);
-                Response.Cookies.Add(authCookie);
-            }
+            var user = res.Value;
+            HttpCookie authCookie = userService.GetAuthCookie(user);
+            Response.Cookies.Add(authCookie);
 
             if (Url.IsLocalUrl(returnUrl)) return Redirect(returnUrl);
 

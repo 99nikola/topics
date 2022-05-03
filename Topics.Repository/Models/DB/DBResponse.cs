@@ -1,14 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿
 
 namespace Topics.Repository.Models
 {
+    public class DBResponse<T> : DBResponse
+    {
+        public T Value { get; set; }
+    }
+
     public class DBResponse
     {
-        public bool Success;
-        public string Message;
+        public bool Success { get; set; }
+        public string Message { get; set; }
     }
 }
