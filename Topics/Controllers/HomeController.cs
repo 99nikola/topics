@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using Topics.Authentication;
+using Topics.Models;
 
 namespace Topics.Controllers
 {
@@ -12,7 +13,7 @@ namespace Topics.Controllers
         [@Authorize(Roles = "basic")]
         public ActionResult Index()
         {
-            return View();
+            return View(new PostList() { Posts = new List<Post>() { new Post(), new Post() } });
         }
     }
 }
