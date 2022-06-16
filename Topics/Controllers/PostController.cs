@@ -20,19 +20,30 @@ namespace Topics.Controllers
             this.postService = postService;
         }
 
-        // GET: Post
-        public ActionResult Index()
-        {
-            return View();
-        }
 
         [HttpPost]
-        public ActionResult Create(string id, Post post)
+        public ActionResult Create(Post post)
         {
             Principal user = (Principal)HttpContext.User;
 
-            postService.CreatePost(id, user.Username, post);
-            return RedirectToAction("Index");
+            postService.CreatePost(post.TopicName, user.Username, post);
+            return RedirectToAction("Get/" + post.TopicName, "Topic", null);
+        }
+
+        [HttpGet]
+        public ActionResult UpVote(string id)
+        {
+            Principal user = (Principal)(HttpContext.User);
+            postService.Vote(user.Username, id, true);
+            return RedirectToAction("Index", "Home");
+        }
+
+        [HttpGet]
+        public ActionResult DownVote(string id)
+        {
+            Principal user = (Principal)(HttpContext.User);
+            postService.Vote(user.Username, id, false);
+            return RedirectToAction("Index", "Home");
         }
     }
 }

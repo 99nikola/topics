@@ -122,6 +122,21 @@ CREATE TABLE [Post] (
 	ON UPDATE CASCADE	
 );
 
+
+CREATE TABLE [Vote] (
+	username VARCHAR(64),
+	postSlug VARCHAR(256),
+	vType vType BINARY(1),
+
+	PRIMARY KEY(username, postSlug),
+
+	CONSTRAINT FK_Vote_postSlug
+	FOREIGN KEY (postSlug)
+	REFERENCES [Post](slug)
+	ON DELETE CASCADE
+	ON UPDATE CASCADE,
+);
+
 CREATE TABLE [Comment] (
 	id INT PRIMARY KEY IDENTITY(1,1),
 	upVotes INT DEFAULT 0,

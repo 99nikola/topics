@@ -10,5 +10,7 @@ namespace Topics.Services.Interfaces
     public interface IPostService
     {
         bool CreatePost(string topicName, string username, Post post);
+        List<Post> GetAllPost();
+        bool Vote(string username, string postSlug, bool type);
     }
 }

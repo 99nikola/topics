@@ -30,5 +30,7 @@ namespace Topics.Models
         public int UpVotes { get; set; }
         public int DownVotes { get; set; }
         public DateTime DateCreated { get; set; }
+
+        public string TopicName { get; set; }
     }
 }
