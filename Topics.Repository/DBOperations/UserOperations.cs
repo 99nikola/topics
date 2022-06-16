@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Web.Helpers;
 using Topics.Repository.Models;
 using Topics.Repository.Models.Account;
@@ -29,7 +30,7 @@ namespace Topics.Repository.DBOperations
                         Connection = connection,
                         CommandText = @"
                             SELECT username, email
-                            FROM tUser
+                            FROM [User]
                             WHERE username = @username OR email = @email
                             ;"
                     };
@@ -82,8 +83,8 @@ namespace Topics.Repository.DBOperations
                         Connection = connection,
 
                         CommandText = @"
-                            INSERT INTO tUser (username, email, password, firstName, lastName)
-                            VALUES (@username, @email, @password, @firstName, @lastName) 
+                            INSERT INTO [User] (username, email, password, firstName, lastName, role)
+                            VALUES (@username, @email, @password, @firstName, @lastName, 'basic') 
                             ;"
                     };
                     insert.Parameters.AddWithValue("username", user.Username);
@@ -101,19 +102,9 @@ namespace Topics.Repository.DBOperations
                         return new DBResponse() { Success = false, Message = "Something went wrong. Unable to create user." };
                     }
 
-                    insert.CommandText =
-                        "INSERT INTO " +
-                        "User_Role (username) " +
-                        "VALUES (@username) ;";
-
-                    rowsAffected = insert.ExecuteNonQuery();
-
                     connection.Close();
 
-
-                    return rowsAffected != 1
-                        ? new DBResponse() { Success = false, Message = "Something went wrong. Unable to create user." }
-                        : new DBResponse() { Success = true };
+                    return new DBResponse() { Success = true };
                 }
                 catch (SqlException ex)
                 {
@@ -156,10 +147,8 @@ namespace Topics.Repository.DBOperations
                         Connection = connection,
                         CommandText = @"
                             SELECT *
-                            FROM tUser AS u
-	                        JOIN User_Role AS ur
-	                        ON u.username = ur.username
-	                        WHERE u.username = @username
+                            FROM [User]
+	                        WHERE username = @username
                             ;"
                     };
 
@@ -169,16 +158,17 @@ namespace Topics.Repository.DBOperations
 
                     reader.Read();
 
+
                     UserModel user = new UserModel()
                     {
                         Username = reader.GetString(1),
                         Email = reader.GetString(2),
                         HashedPassword = reader.GetString(3),
-                        FirstName = Utils.ConvertFromDBVal<string>(reader.GetValue(4)),
-                        LastName = Utils.ConvertFromDBVal<string>(reader.GetValue(5)),
-                        Avatar = Utils.ConvertFromDBVal<string>(reader.GetValue(6)),
-                        About = Utils.ConvertFromDBVal<string>(reader.GetValue(7)),
-                        Roles = new HashSet<RoleModel>() { new RoleModel() { Name = reader.GetString(9) } }
+                        Role = new RoleModel() { Name =  reader.GetString(4) },
+                        FirstName = Utils.ConvertFromDBVal<string>(reader.GetValue(5)),
+                        LastName = Utils.ConvertFromDBVal<string>(reader.GetValue(6)),
+                        Avatar = Utils.ConvertFromDBVal<string>(reader.GetValue(7)),
+                        About = Utils.ConvertFromDBVal<string>(reader.GetValue(8)),
                     };
 
                     connection.Close();
@@ -207,7 +197,7 @@ namespace Topics.Repository.DBOperations
                         Connection = connection,
                         CommandText = @"
                             SELECT password
-                            FROM tUser
+                            FROM [User]
                             WHERE username = @username 
                             ;"
                     };
@@ -249,7 +239,7 @@ namespace Topics.Repository.DBOperations
                         Connection = connection,
                         CommandText = @"
                             SELECT username
-                            FROM tUser
+                            FROM [User]
                             WHERE email = @email 
                             ;"
                     };
@@ -269,7 +259,7 @@ namespace Topics.Repository.DBOperations
             }
         }
 
-        public static DBResponse<string[]> GetUserRoles(string username, string connectionString)
+        public static DBResponse<RoleModel> GetUserRole(string username, string connectionString)
         {
             using (SqlConnection connection = new SqlConnection())
             {
@@ -282,8 +272,8 @@ namespace Topics.Repository.DBOperations
                     {
                         Connection = connection,
                         CommandText = @"
-                            SELECT roleName
-                            FROM User_Role
+                            SELECT role
+                            FROM [User]
                             WHERE username = @username;
                             ;"
                     };
@@ -291,19 +281,15 @@ namespace Topics.Repository.DBOperations
 
                     SqlDataReader reader = selectUserRoles.ExecuteReader();
 
-                    List<string> roles = new List<string>();
+                    RoleModel roleModel = new RoleModel { Name = reader.GetString(0) };
                     
-                    while (reader.Read())
-                    {
-                        roles.Add(reader.GetString(0));
-                    }
 
                     connection.Close();
-                    return new DBResponse<string[]>() { Success = true, Value = roles.ToArray() };
+                    return new DBResponse<RoleModel>() { Success = true, Value = roleModel };
                 }
                 catch (Exception ex)
                 {
-                    return new DBResponse<string[]>() { Success = false, Message = ex.Message };
+                    return new DBResponse<RoleModel>() { Success = false, Message = ex.Message };
                 }
             }
         }

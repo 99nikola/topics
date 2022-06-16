@@ -12,7 +12,7 @@ namespace Topics.Services.Interfaces
         DBResponse<UserModel> GetUser(SignInViewModel signIn);
         DBResponse<UserModel> GetUser(string username);
         DBResponse<string> GetUsernameByEmail(string email);
-        DBResponse<string[]> GetUserRoles(string username);
+        DBResponse<RoleModel> GetUserRole(string username);
         DBResponse<string> DoesExist(string username, string email);
         DBResponse<string> DoesExist(string username);
         HttpCookie GetAuthCookie(UserModel user);

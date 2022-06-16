@@ -6,7 +6,7 @@ using System.Security.Principal;
 using System.Web;
 using System.Web.Mvc;
 
-namespace Topics.Authentication
+namespace Topics.Auth
 {
     public class Authorize : AuthorizeAttribute
     {

@@ -45,6 +45,7 @@ namespace Topics
             // container.RegisterType<IProductRepository, ProductRepository>();
 
             container.RegisterType<IUserService, UserService>();
+            container.RegisterType<ITopicService, TopicService>();
         }
     }
 }

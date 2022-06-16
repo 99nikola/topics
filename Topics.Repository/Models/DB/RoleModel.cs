@@ -8,8 +8,7 @@ namespace Topics.Repository.Models.DB
 {
     public class RoleModel
     {
-        public string Name { get; set; }
-        public virtual ICollection<UserModel> Users { get; set; }
+        public string Name { get;  set; } 
 
         public override bool Equals(object obj)
         {

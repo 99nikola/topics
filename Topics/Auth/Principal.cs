@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Principal;
 using System.Web;
+using Topics.Repository.Models.DB;
 
-namespace Topics.Authentication
+namespace Topics.Auth
 {
     public class Principal : IPrincipal
     {
@@ -12,7 +13,7 @@ namespace Topics.Authentication
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Email { get; set; }
-        public string[] Roles { get; set; }
+        public RoleModel Role { get; set; }
 
 
         public IIdentity Identity
@@ -22,7 +23,7 @@ namespace Topics.Authentication
 
         public bool IsInRole(string role)
         {
-            return Roles.Any(r => role.Contains(r));
+            return role.Contains(Role.Name);
         }
 
         public Principal(string username)

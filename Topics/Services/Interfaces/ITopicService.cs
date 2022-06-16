@@ -1,13 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using Topics.Models;
 
 namespace Topics.Services.Interfaces
 {
     public interface ITopicService
     {
-
+        bool CreateTopic(TopicModel topic, string username);
+        TopicModel GetTopic(string name);
+        bool AddMember(TopicModel topic, string username); 
+        bool IsMember(TopicModel topic, string username);   
+        bool DeleteMember(TopicModel topic, string username);
+        List<TopicModel> GetTopics();
     }
 }

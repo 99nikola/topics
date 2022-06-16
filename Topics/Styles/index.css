@@ -2,3 +2,38 @@
 .mw-100px {
     max-width: 1000px;
 }
+
+.cover {
+    top: 0;
+    left: 0;
+    object-fit: cover;
+    z-index: -1;
+    width: 100%;
+    height: auto;
+    max-height: 35vh;
+    min-height: 10vh;
+}
+
+.z-index-2 {
+    z-index: 1;
+}
+
+.avatar {
+    border-radius: 50%;
+    width: 75px;
+    height: 75px;
+    object-fit: cover;
+}
+
+.object-fit-cover {
+    object-fit: cover;
+}
+
+.arrow-icon {
+    font-size: 30px;
+    cursor: pointer;
+}
+
+.width-max-content {
+    width: max-content;
+}

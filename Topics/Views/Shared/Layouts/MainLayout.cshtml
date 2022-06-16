@@ -1,8 +1,8 @@
 ﻿
 @{
     Layout = null;
-    var controllerName = ViewContext.RouteData.Values["controller"];
-    var actionName = ViewContext.RouteData.Values["action"];
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString().ToLower();
+    string actionName = ViewContext.RouteData.Values["action"].ToString().ToLower();
 }
 
 <!DOCTYPE html>
@@ -13,11 +13,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@ViewBag.Title</title>
 
-    <link href="~/Content/bootstrap.css" rel="stylesheet" />
+
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
     <link href="~/Styles/index.css" rel="stylesheet" />
+
 </head>
 <body>
-    <header class="p-3 bg-dark text-white">
+    <header class="p-3 bg-dark text-white position-sticky top-0 z-index-2">
         <div class="container">
             <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
                 <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
@@ -25,15 +28,37 @@
                 </a>
 
                 <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
-                    <li><a href="/" class="nav-link px-2 
-                           @if (controllerName.Equals("Home") && actionName.Equals("Index")) { Write("text-primary"); } 
-                           else { Write("text-white"); } ">
-                        Home</a>
+                    <li>
+                        <a href="/" class="nav-link px-2
+                           @if (controllerName.Equals("home") && actionName.Equals("index")) { Write("text-primary"); }
+                           else { Write("text-white"); }">
+                            Home
+                        </a>
                     </li>
-                    <li><a href="#" class="nav-link px-2 text-white">Features</a></li>
-                    <li><a href="#" class="nav-link px-2 text-white">Pricing</a></li>
-                    <li><a href="#" class="nav-link px-2 text-white">FAQs</a></li>
-                    <li><a href="#" class="nav-link px-2 text-white">About</a></li>
+                    <li>
+                        <a href="/topic" class="nav-link px-2
+                           @if (controllerName.Equals("topic") && actionName.Equals("index")) { Write("text-primary"); }
+                           else { Write("text-white"); }">
+                            Topics
+                        </a>
+                    </li>
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <li>
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal-create-topic">
+                                Create Topic
+                            </button>
+                        </li>
+                        if (controllerName.Equals("topic") && actionName.Equals("get"))
+                        {       
+                            <li>
+                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal-create-post">
+                                    Create Post
+                                </button>
+                            </li>
+                        }
+                    }
+
                 </ul>
 
                 <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3">
@@ -41,21 +66,30 @@
                 </form>
 
                 <div class="text-end">
-                    
+
                     @if (User.Identity.IsAuthenticated)
-                    { 
-                        <button type="button" class="btn btn-warning" id="sign-out">Sign-Out</button> 
+                    {
+                        <button type="button" class="btn btn-warning" id="sign-out">Sign-Out</button>
                     }
-                    else 
-                    { 
-                        <button type="button" class="btn btn-warning" id="sign-up">Sign-Up</button> 
-                        <button type="button" class="btn btn-outline-light me-2" id="sign-in">Sign-In</button> 
+                    else
+                    {
+                        <button type="button" class="btn btn-warning" id="sign-up">Sign-Up</button>
+                        <button type="button" class="btn btn-outline-light me-2" id="sign-in">Sign-In</button>
                     }
                 </div>
             </div>
         </div>
     </header>
     <main>
+        @if (User.Identity.IsAuthenticated)
+        {
+            @Html.Partial("~/Views/Shared/ModalCreateTopic.cshtml", new Topics.Models.TopicModel())
+
+            if (controllerName.Equals("topic") && actionName.Equals("get"))
+            {
+                @Html.Partial("~/Views/Shared/ModalCreatePost.cshtml", new Topics.Models.Post())
+            }
+        }
         @RenderBody()
     </main>
 
@@ -69,5 +103,6 @@
         const signOut = document.getElementById("sign-out");
         if (signOut !== null) signOut.addEventListener("click", () => location.href = "/signout");
     </script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
 </body>
 </html>

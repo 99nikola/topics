@@ -4,7 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
-using Topics.Authentication;
+using Topics.Auth;
 using Topics.Repository.Models.Account;
 using Topics.Repository.Models.DB;
 using Topics.Services.Interfaces;

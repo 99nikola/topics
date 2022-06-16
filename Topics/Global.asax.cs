@@ -1,12 +1,11 @@
+
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.Security;
-using Topics.Authentication;
+using Topics.Auth;
 
 namespace Topics
 {
@@ -31,7 +30,7 @@ namespace Topics
             SerializeModel serializeModel = JsonConvert.DeserializeObject<SerializeModel>(authTicket.UserData);
             Principal principal = new Principal(authTicket.Name);
             principal.Username = serializeModel.Username;
-            principal.Roles = serializeModel.Roles.ToArray();
+            principal.Role = serializeModel.Role;
 
             HttpContext.Current.User = principal;
         }

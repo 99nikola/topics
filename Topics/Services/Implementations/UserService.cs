@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Security;
-using Topics.Authentication;
+using Topics.Auth;
 using Topics.Repository.DBOperations;
 using Topics.Repository.Models;
 using Topics.Repository.Models.Account;
@@ -49,9 +49,9 @@ namespace Topics.Services.Implementations
             return UserOperations.GetUsernameByEmail(email, ConnectionString);
         }
 
-        public DBResponse<string[]> GetUserRoles(string username)
+        public DBResponse<RoleModel> GetUserRole(string username)
         {
-            return UserOperations.GetUserRoles(username, ConnectionString);
+            return UserOperations.GetUserRole(username, ConnectionString);
         }
 
         public HttpCookie GetAuthCookie(UserModel user)
@@ -60,7 +60,7 @@ namespace Topics.Services.Implementations
             SerializeModel userModel = new SerializeModel()
             {
                 Username = user.Username,
-                Roles = user.Roles.Select(role => role.Name).ToList()
+                Role = user.Role
             };
 
             string userData = JsonConvert.SerializeObject(userModel);
