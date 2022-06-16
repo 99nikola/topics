@@ -9,7 +9,7 @@
             </div>
             <div class="modal-body">
 
-                @using (Html.BeginForm("Create", "Post", FormMethod.Post, new { enctype = "multipart/form-data", id = "form-create-post" }))
+                @using (Html.BeginForm("Create/" + (string)ViewBag.TopicName, "Post", FormMethod.Post, new { enctype = "multipart/form-data", id = "form-create-post" }))
                 {
                     @Html.AntiForgeryToken()
 
@@ -45,8 +45,7 @@
                                 @Html.ValidationMessageFor(model => model.Content, "", new { @class = "text-danger" })
                             </div>
                         </div>
-                    </div>
-                }
+                    </div>}
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>

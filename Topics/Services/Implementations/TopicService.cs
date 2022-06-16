@@ -245,7 +245,7 @@ namespace Topics.Services.Implementations
                     {
                         Connection= connection,
                         CommandText = @"
-                            SELECT name, cover, title, description 
+                            SELECT name, cover, title, description, avatar
                             FROM [Topic]
                             ;"
                     };
@@ -262,6 +262,7 @@ namespace Topics.Services.Implementations
                             CoverImgSrc = ConvertToImage(ConvertToBase64(Utils.ConvertFromDBVal<byte[]>(reader.GetValue(1)))),
                             Title = reader.GetString(2),
                             Description = reader.GetString(3),
+                            AvatarImgSrc = ConvertToImage(ConvertToBase64(Utils.ConvertFromDBVal<byte[]>(reader.GetValue(4))))
                         });
                     }
 

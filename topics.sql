@@ -42,8 +42,6 @@ CREATE TABLE [Follow] (
 	REFERENCES [User](username)
 );
 
-ALTER TABLE [Topic]
-ADD avatar VARBINARY(MAX);
 
 CREATE TABLE [Topic] (
 	id INT NOT NULL IDENTITY(1,1),
@@ -51,6 +49,7 @@ CREATE TABLE [Topic] (
 	title VARCHAR(256),
 	description TEXT,
 	cover VARBINARY(MAX),
+	avatar VARBINARY(MAX),
 	owner VARCHAR(64) NOT NULL,
 
 	CONSTRAINT FK_Topic_owner

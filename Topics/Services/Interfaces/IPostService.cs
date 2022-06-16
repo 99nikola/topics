@@ -7,7 +7,7 @@ using Topics.Models;
 
 namespace Topics.Services.Interfaces
 {
-    internal interface IPostService
+    public interface IPostService
     {
         bool CreatePost(string topicName, string username, Post post);
     }

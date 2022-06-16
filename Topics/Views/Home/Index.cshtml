@@ -12,10 +12,15 @@
     {
         <div class="row g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
             <div class="d-flex flex-column align-items-center width-max-content mx-2">
-                <i class="bi bi-arrow-up-square arrow-icon" name="up-arrow" data-post-slug="@post.Slug"></i>
+                <a href="@Url.Action("UpVote/" + post.Slug, "Post")" class="text-decoration-none">
+                    <i class="bi bi-arrow-up-square arrow-icon"></i>
+                </a>
                 32
-                <i class="bi bi-arrow-down-square arrow-icon" name="down-arrow" data-post-slug="@post.Slug"></i>
+                <a href="@Url.Action("DownVote/" + post.Slug, "Post")" class="text-decoration-none">
+                    <i class="bi bi-arrow-down-square arrow-icon"></i>
+                </a>
             </div>
+
             <div class="col p-4 d-flex flex-column position-static">
                 <strong class="d-inline-block mb-2 text-primary">World</strong>
                 <h3 class="mb-0">Featured post</h3>
@@ -32,26 +37,3 @@
        
 </div>
 
-<script>
-    const upArrows = document.getElementsByName("up-arrow");
-    const downArrows = document.getElementsByName("down-arrow");
-
-
-    upArrows.forEach((upArrow) => 
-        upArrow.addEventListener("click", onUpArrow)
-    );
-
-    downArrows.forEach(downArrow =>
-        downArrow.addEventListener("click", onDownArrow)
-    );
-
-    function onUpArrow(event) {
-        const postSlug = event.target.attributes["data-post-slug"].nodeValue;
-        location.href = `/post/upVote/${postSlug}`;
-    }
-
-    function onDownArrow(event) {
-        const postSlug = event.target.attributes["data-post-slug"].nodeValue;
-        location.href = `/post/downVote/${postSlug}`;
-    }
-</script>

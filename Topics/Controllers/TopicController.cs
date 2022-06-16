@@ -20,6 +20,7 @@ namespace Topics.Controllers
         public ActionResult Index()
         {
             List<TopicModel> topics = topicService.GetTopics();
+            
 
             ViewBag.Topics = topics;
             return View();
@@ -35,6 +36,7 @@ namespace Topics.Controllers
 
             bool isMember = topicService.IsMember(topic, user.Username);
             ViewBag.IsMember = isMember;
+            ViewBag.TopicName = id;
             return View(topic);
         }
 

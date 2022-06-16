@@ -30,13 +30,13 @@
                 <div class="btn-group">
                     @if (topic.IsMemeber(user.Username))
                     {
-                        <button class="btn btn-danger" data-topic-name="@topic.Name" name="btn-leave-topic">Leave</button>
+                        @Html.ActionLink("Leave", "Leave/" + topic.Name, "Topic", null, new { @class = "btn btn-danger" })
                     }
                     else
                     {
-                        <button class="btn btn-primary" data-topic-name="@topic.Name" name="btn-join-topic">Join</button>
+                        @Html.ActionLink("Join", "Join/" + topic.Name, "Topic", null, new { @class = "btn btn-primary" })
                     }
-                    <button class="btn btn-outline-secondary" name="btn-view-topic" data-href="/topic/get/@topic.Name">View</button>
+                    @Html.ActionLink("View", "Get/" + topic.Name, "Topic", null, new { @class = "btn btn-outline-secondary" })
                 </div>
             </div>
         </div>
@@ -44,23 +44,6 @@
 </div>
 
 <script>
-    const btnView = document.getElementsByName("btn-view-topic");
-    btnView.forEach(view => 
-        view.addEventListener("click", () => location.href = view.attributes["data-href"].nodeValue)
-    );
-
-    const btnJoinTopic = document.getElementsByName("btn-join-topic");
-    btnJoinTopic.forEach(join => 
-        join.addEventListener("click", () => location.href = "/topic/join/" + join.attributes["data-topic-name"].nodeValue)
-    );
-
-
-    const btnLeaveTopic = document.getElementsByName("btn-leave-topic");
-    btnLeaveTopic.forEach(leave => 
-        leave.addEventListener("click", () => location.href = "/topic/leave/" + leave.attributes["data-topic-name"].nodeValue)
-    );
-
-
     const divRoot = document.getElementById("observer-root");
 
     const observer = new IntersectionObserver((entries) => {
