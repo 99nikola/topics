@@ -21,6 +21,15 @@ namespace Topics.Controllers
         [@Authorize(Roles = "basic")]
         public ActionResult Index()
         {
+            Principal user = (Principal)HttpContext.User;
+
+            ISet<string> upVotedPosts = postService.GetVotedPosts(user.Username, true);
+            ViewBag.UpVotedPosts = upVotedPosts;
+
+            ISet<string> downVotedPosts = postService.GetVotedPosts(user.Username, false);
+            ViewBag.DownVotedPosts = downVotedPosts;
+
+
             return View(new PostList() { Posts = postService.GetAllPost() });
         }
     }

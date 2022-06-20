@@ -35,7 +35,7 @@ namespace Topics.Controllers
         {
             Principal user = (Principal)(HttpContext.User);
             postService.Vote(user.Username, id, true);
-            return RedirectToAction("Index", "Home");
+            return Redirect(Request.UrlReferrer.ToString());
         }
 
         [HttpGet]
@@ -43,7 +43,20 @@ namespace Topics.Controllers
         {
             Principal user = (Principal)(HttpContext.User);
             postService.Vote(user.Username, id, false);
-            return RedirectToAction("Index", "Home");
+            return Redirect(Request.UrlReferrer.ToString());
+        }
+
+        [HttpGet]
+        public ActionResult View(string id)
+        {
+            Principal user = (Principal)HttpContext.User;
+
+            ViewBag.UpVoted = postService.IsVotedPost(user.Username, id, true);
+            ViewBag.DownVoted = postService.IsVotedPost(user.Username, id, false);
+
+            Post post = postService.GetPost(id);
+
+            return View(post);
         }
     }
 }

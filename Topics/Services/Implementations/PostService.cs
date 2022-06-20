@@ -21,7 +21,7 @@ namespace Topics.Services.Implementations
 
         public bool CreatePost(string topicName, string username, Post post)
         {
-            using(SqlConnection connection = new SqlConnection())
+            using (SqlConnection connection = new SqlConnection())
             {
                 try
                 {
@@ -50,12 +50,13 @@ namespace Topics.Services.Implementations
                     connection.Close();
 
                     return rowsAffected == 1;
-                } catch (Exception ex)
+                }
+                catch (Exception ex)
                 {
                     System.Diagnostics.Debug.WriteLine(ex.Message);
                     return false;
                 }
-            }    
+            }
         }
 
         public bool Vote(string username, string postSlug, bool type)
@@ -69,7 +70,7 @@ namespace Topics.Services.Implementations
 
                     SqlCommand command = new SqlCommand()
                     {
-                        Connection=connection,
+                        Connection = connection,
                         CommandText = @"
                             SELECT vType 
                             FROM [Vote] 
@@ -83,7 +84,7 @@ namespace Topics.Services.Implementations
 
                     SqlDataReader reader = command.ExecuteReader();
 
-                    
+
                     if (reader.Read())
                     {
                         bool vType = reader.GetBoolean(0);
@@ -147,7 +148,7 @@ namespace Topics.Services.Implementations
 
                     SqlCommand select = new SqlCommand()
                     {
-                        Connection= connection,
+                        Connection = connection,
                         CommandText = @"
                             SELECT slug, username, topicName, title, upVotes, downVotes, dateCreated, content
                             FROM [Post]
@@ -155,6 +156,180 @@ namespace Topics.Services.Implementations
                     };
 
                     SqlDataReader reader = select.ExecuteReader();
+                    List<Post> posts = new List<Post>();
+
+                    while (reader.Read())
+                    {
+                        posts.Add(new Post()
+                        {
+                            Slug = reader.GetString(0),
+                            TopicName = reader.GetString(2),
+                            Title = reader.GetString(3),
+                            UpVotes = reader.GetInt32(4),
+                            DownVotes = reader.GetInt32(5),
+                            DateCreated = reader.GetDateTime(6),
+                            Content = reader.GetString(7)
+                        });
+                    }
+
+
+                    connection.Close();
+                    return posts;
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine(ex.Message);
+                    return null;
+                }
+            }
+        }
+
+        public ISet<string> GetVotedPosts(string username, bool type)
+        {
+            using (SqlConnection connection = new SqlConnection())
+            {
+                try
+                {
+                    connection.ConnectionString = ConnectionString;
+                    connection.Open();
+
+                    SqlCommand select = new SqlCommand()
+                    {
+                        Connection = connection,
+                        CommandText = @"SELECT postSlug FROM [Vote] WHERE username = @username AND vType = @type"
+                    };
+
+                    select.Parameters.AddWithValue("username", username);
+                    select.Parameters.AddWithValue("type", type);
+
+                    SqlDataReader reader = select.ExecuteReader();
+
+                    ISet<string> posts = new HashSet<string>();
+
+                    while (reader.Read())
+                    {
+                        posts.Add(reader.GetString(0));
+                    }
+
+                    connection.Close();
+
+                    return posts;
+
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine(ex.Message);
+                    return null;
+                }
+            }
+        }
+
+        public Post GetPost(string postSlug)
+        {
+            using (SqlConnection connection = new SqlConnection())
+            {
+                try
+                {
+                    connection.ConnectionString = ConnectionString;
+                    connection.Open();
+
+                    SqlCommand select = new SqlCommand()
+                    {
+                        Connection = connection,
+                        CommandText = @"
+                            SELECT slug, username, topicName, title, upVotes, downVotes, dateCreated, content
+                            FROM [Post]
+                            WHERE slug = @slug
+                            ;"
+                    };
+
+                    select.Parameters.AddWithValue("slug", postSlug);
+
+                    SqlDataReader reader = select.ExecuteReader();
+
+                    if (!reader.Read())
+                        return null;
+
+                    Post post = new Post()
+                    {
+                        Slug = reader.GetString(0),
+                        TopicName = reader.GetString(2),
+                        Title = reader.GetString(3),
+                        UpVotes = reader.GetInt32(4),
+                        DownVotes = reader.GetInt32(5),
+                        DateCreated = reader.GetDateTime(6),
+                        Content = reader.GetString(7)
+                    };
+
+                    connection.Close();
+
+                    return post;
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine(ex.Message);
+                    return null;
+                }
+            }
+        }
+
+        public bool IsVotedPost(string username, string postSlug, bool type)
+        {
+            using (SqlConnection connection = new SqlConnection())
+            {
+                try
+                {
+                    connection.ConnectionString = ConnectionString;
+                    connection.Open();
+
+                    SqlCommand select = new SqlCommand()
+                    {
+                        Connection = connection,
+                        CommandText = @"
+                            SELECT postSlug 
+                            FROM [Vote] 
+                            WHERE username = @username AND vType = @type AND postSlug = @slug
+                            ;"
+                    };
+
+                    select.Parameters.AddWithValue("username", username);
+                    select.Parameters.AddWithValue("type", type);
+                    select.Parameters.AddWithValue("slug", postSlug);
+
+                    SqlDataReader reader = select.ExecuteReader();
+
+                    if (reader.Read()) return true;
+                    return false;
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine(ex.Message);
+                    return false;
+                }
+            }
+        }
+
+        public List<Post> GetTopicPosts(string topicName)
+        {
+            using(SqlConnection connection = new SqlConnection())
+            {
+                try
+                {
+                    connection.ConnectionString = ConnectionString;
+                    connection.Open();
+
+                    SqlCommand select = new SqlCommand()
+                    {
+                        Connection = connection,
+                        CommandText = @"
+                            SELECT slug, username, topicName, title, upVotes, downVotes, dateCreated, content 
+                            FROM [Post]
+                            WHERE topicName = @topicName
+                            ;"
+                    };
+                    select.Parameters.AddWithValue("topicName", topicName);
+                    SqlDataReader reader = select.ExecuteReader();
+
                     List<Post> posts = new List<Post>();
 
                     while(reader.Read())
@@ -170,18 +345,17 @@ namespace Topics.Services.Implementations
                             Content = reader.GetString(7)
                         });
                     }
-                    
 
                     connection.Close();
+
                     return posts;
                 } 
-                catch (Exception ex)
+                catch(Exception ex)
                 {
                     System.Diagnostics.Debug.WriteLine(ex.Message);
-                    return null; 
+                    return null;
                 }
             }
         }
-
     }
 }

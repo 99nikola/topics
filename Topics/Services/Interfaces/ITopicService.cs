@@ -11,5 +11,7 @@ namespace Topics.Services.Interfaces
         bool IsMember(TopicModel topic, string username);   
         bool DeleteMember(TopicModel topic, string username);
         List<TopicModel> GetTopics();
+        List<string> GetModerators(string topicName);
+        bool EditTopic(TopicModel topic, string username);
     }
 }

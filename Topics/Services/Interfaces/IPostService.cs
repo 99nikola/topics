@@ -11,6 +11,10 @@ namespace Topics.Services.Interfaces
     {
         bool CreatePost(string topicName, string username, Post post);
         List<Post> GetAllPost();
+        List<Post> GetTopicPosts(string topicName);
         bool Vote(string username, string postSlug, bool type);
+        ISet<string> GetVotedPosts(string username, bool type);
+        bool IsVotedPost(string username, string postSlug, bool type);
+        Post GetPost(string postSlug);
     }
 }

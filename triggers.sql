@@ -1,110 +1,99 @@
--- User triggers
-
-use topics;
-
-CREATE TRIGGER Trigger_User_Update
-ON tUser
-INSTEAD OF UPDATE
+CREATE TRIGGER TG_Vote_Post_Insert
+ON [Vote]
+AFTER INSERT
 AS
-	SET NOCOUNT ON
-	IF UPDATE(username)
+BEGIN
+	DECLARE @slug VARCHAR(256), @type BIT, @upVotes INT, @downVotes INT;
+
+	SELECT @slug = postSlug, @type = vType
+	FROM Inserted
+
+	SELECT @upVotes = upVotes, @downVotes = downVotes
+	FROM [Post]
+	WHERE slug = @slug;
+
+	IF (@type = 1)
+	BEGIN 
+		SET @upVotes = @upVotes + 1;
+
+		UPDATE [Post]
+		SET upVotes = @upVotes
+		WHERE slug = @slug;
+	END
+	ELSE
 	BEGIN
+		SET @downVotes = @downVotes + 1;
 
-		DECLARE @update VARCHAR(64), @current VARCHAR(64);
-
-		SELECT @update = username
-		FROM inserted;
-
-		SELECT @current = u.username
-		FROM tUser u
-		INNER JOIN Inserted i
-			ON i.id = u.id;
-
-		INSERT INTO 
-		tUser (username, password, email, firstName, lastName, avatar, about)
-		SELECT @update, password, email, firstName, lastName, avatar, about
-		FROM tUser
-		WHERE username = @current;
-
-		UPDATE Follow
-		SET following  = @update
-		WHERE following = @current;
-
-		UPDATE Follow
-		SET follower = @update
-		WHERE follower = @current;
-
-		UPDATE Comment
-		SET ownerUsername = @update
-		WHERE ownerUsername = @current;
-
-		UPDATE Topic
-		SET owner = @update
-		WHERE owner = @current;
-
-		UPDATE Post
-		SET ownerUsername = @update
-		WHERE ownerUsername = @current;
-
-		UPDATE Topic_Member
-		SET memberName = @update
-		WHERE memberName = @current;
-
-		UPDATE Topic_Moderator
-		SET moderatorName = @update
-		WHERE moderatorName = @current;
-
-		UPDATE User_Role
-		SET username = @update
-		WHERE username = @current;
-
-		DELETE FROM tUser
-		WHERE username = @current;
+		UPDATE [Post]
+		SET downVotes = @downVotes
+		WHERE slug = @slug;
 	END
 
-	UPDATE tUser 
-	SET password = i.password, 
-		email = i.email, 
-		firstName = i.firstName, 
-		lastName = i.lastName, 
-		avatar = i.avatar, 
-		about = i.about
-	FROM tUser u
-		INNER JOIN inserted i
-		ON i.username = u.username;
-;
+END
 
-CREATE TRIGGER Trigger_User_Delete
-ON tUser
-INSTEAD OF DELETE
+CREATE TRIGGER TG_Vote_Post_Delete
+ON [Vote]
+AFTER DELETE
 AS
-	SET NOCOUNT ON
-	DECLARE @username VARCHAR(64)
+BEGIN
+	DECLARE @slug VARCHAR(256), @type BIT, @upVotes INT, @downVotes INT;
 
-	SELECT @username = username
-	FROM deleted;
+	SELECT @slug = postSlug, @type = vType
+	FROM Insert
 
-	DELETE FROM Follow
-	WHERE follower = @username OR following = @username;
 
-	DELETE FROM Comment
-	WHERE ownerUsername = @username;
+	SELECT @upVotes = upVotes, @downVotes = downVotes
+	FROM [Post]
+	WHERE slug = @slug;
 
-	DELETE FROM Topic
-	WHERE owner = @username;
+	IF (@type = 1)
+	BEGIN 
+		SET @upVotes = @upVotes - 1;
 
-	DELETE FROM Post
-	WHERE ownerUsername = @username;
+		UPDATE [Post]
+		SET upVotes = @upVotes
+		WHERE slug = @slug;
+	END
+	ELSE
+	BEGIN
+		SET @downVotes = @downVotes - 1;
 
-	DELETE FROM Topic_Member
-	WHERE memberName = @username;
+		UPDATE [Post]
+		SET downVotes = @downVotes
+		WHERE slug = @slug;
+	END
+END
 
-	DELETE FROM Topic_Moderator
-	WHERE moderatorName = @username;
 
-	DELETE FROM User_Role
-	WHERE username = @username;
+CREATE TRIGGER TG_Vote_Post_Update
+ON [Vote]
+AFTER UPDATE
+AS
+BEGIN
+	DECLARE @slug VARCHAR(256), @type BIT, @upVotes INT, @downVotes INT;
 
-    DELETE FROM tUser 
-	WHERE username = @username;
-;
+	SELECT @slug = postSlug, @type = vType
+	FROM Inserted
+
+
+	SELECT @upVotes = upVotes, @downVotes = downVotes
+	FROM [Post]
+	WHERE slug = @slug;
+
+	IF (@type = 1)
+	BEGIN 
+		SET @upVotes = @upVotes + 1;
+		SET @downVotes = @downVotes - 1;
+	END
+	ELSE
+	BEGIN
+		SET @downVotes = @downVotes + 1;
+		SET @upVotes = @upVotes - 1;
+	END
+
+	UPDATE [Post]
+	SET upVotes = @upVotes,
+		downVotes = @downVotes
+	WHERE slug = @slug;
+
+END

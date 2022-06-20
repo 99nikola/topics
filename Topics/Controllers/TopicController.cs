@@ -10,18 +10,18 @@ namespace Topics.Controllers
     public class TopicController : Controller
     {
         private readonly ITopicService topicService;
+        private readonly IPostService postService;
 
-        public TopicController(ITopicService topicService)
+        public TopicController(ITopicService topicService, IPostService postService)
         {
-            this.topicService = topicService;   
+            this.topicService = topicService;
+            this.postService = postService;
         }
 
         [HttpGet]
         public ActionResult Index()
         {
             List<TopicModel> topics = topicService.GetTopics();
-            
-
             ViewBag.Topics = topics;
             return View();
         }
@@ -30,13 +30,20 @@ namespace Topics.Controllers
         public ActionResult Get(string id)
         {
             TopicModel topic = topicService.GetTopic(id);
-            if (topic == null) return View(topic);
-
             Principal user = (Principal)HttpContext.User;
 
             bool isMember = topicService.IsMember(topic, user.Username);
             ViewBag.IsMember = isMember;
             ViewBag.TopicName = id;
+
+
+            ISet<string> upVotedPosts = postService.GetVotedPosts(user.Username, true);
+            ViewBag.UpVotedPosts = upVotedPosts;
+
+            ISet<string> downVotedPosts = postService.GetVotedPosts(user.Username, false);
+            ViewBag.DownVotedPosts = downVotedPosts;
+
+            topic.Posts = postService.GetTopicPosts(id);
             return View(topic);
         }
 
@@ -49,7 +56,19 @@ namespace Topics.Controllers
             Principal user = (Principal)HttpContext.User;
 
             topicService.CreateTopic(model, user.Username);
-            return Redirect("/");
+            return Redirect(Request.UrlReferrer.ToString());
+        }
+
+        [HttpPost]
+        public ActionResult Edit(TopicModel model)
+        {
+            if (!ModelState.IsValid)
+                return Redirect("/");
+
+            Principal user = (Principal)HttpContext.User;
+
+            topicService.EditTopic(model, user.Username);
+            return Redirect(Request.UrlReferrer.ToString());
         }
 
         [HttpGet]
@@ -59,7 +78,7 @@ namespace Topics.Controllers
             TopicModel topic = topicService.GetTopic(id);
 
             topicService.AddMember(topic, user.Username);
-            return RedirectToAction("Index/" + id);
+            return Redirect(Request.UrlReferrer.ToString());
         }
 
         [HttpGet]
@@ -69,7 +88,7 @@ namespace Topics.Controllers
             TopicModel topic = topicService.GetTopic(id);
 
             topicService.DeleteMember(topic, user.Username);
-            return RedirectToAction("Index/" + id);
+            return Redirect(Request.UrlReferrer.ToString());
         }
         
     }

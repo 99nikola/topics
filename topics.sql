@@ -123,12 +123,17 @@ CREATE TABLE [Post] (
 );
 
 
+
 CREATE TABLE [Vote] (
 	username VARCHAR(64),
 	postSlug VARCHAR(256),
-	vType vType BINARY(1),
+	vType BIT,
 
 	PRIMARY KEY(username, postSlug),
+
+	CONSTRAINT FK_Vote_username
+	FOREIGN KEY (username)
+	REFERENCES [User](username),
 
 	CONSTRAINT FK_Vote_postSlug
 	FOREIGN KEY (postSlug)

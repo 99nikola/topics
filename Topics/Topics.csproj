@@ -240,6 +240,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\ModalTopicModel.cs" />
     <Compile Include="Models\Post.cs" />
     <Compile Include="Models\Topic.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -295,11 +296,12 @@
     <Content Include="Views\SignIn\Index.cshtml" />
     <Content Include="Scripts\jquery-3.6.0.slim.min.map" />
     <Content Include="Scripts\jquery-3.6.0.min.map" />
-    <Content Include="Views\Shared\ModalCreateTopic.cshtml" />
+    <Content Include="Views\Shared\ModalTopic.cshtml" />
     <Content Include="Views\Topic\Get.cshtml" />
     <Content Include="Views\Topic\Index.cshtml" />
-    <Content Include="Views\Shared\Post.cshtml" />
+    <Content Include="Views\Shared\Posts.cshtml" />
     <Content Include="Views\Shared\ModalCreatePost.cshtml" />
+    <Content Include="Views\Post\View.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -309,7 +311,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\Post\" />
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="Scripts\index.d.ts" />

@@ -17,6 +17,8 @@ namespace Topics.Models
             this.topicService  = new TopicService();
         }
 
+        public int Id { get; set; }
+
         public HttpPostedFileBase CoverImg { get; set; }
         
         [Required(ErrorMessage = "A cover image is required"), FileExtensions(ErrorMessage = "Please upload an image file.", Extensions = ".png, .jpg, .jpeg")]
@@ -63,6 +65,10 @@ namespace Topics.Models
         {
             return topicService.IsMember(this, username);
         }
+        public List<Post> Posts { get; set; }
+
+        public string Owner { get; set; }
+        public List<string> Moderators { get; set; }
 
     }
 }

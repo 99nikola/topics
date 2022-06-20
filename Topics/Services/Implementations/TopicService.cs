@@ -74,7 +74,7 @@ namespace Topics.Services.Implementations
                     SqlCommand select = new SqlCommand()
                     {
                         CommandText = @"
-                            SELECT name, title, description, cover, owner, avatar
+                            SELECT name, title, description, cover, owner, avatar, id
                             FROM [Topic] 
                             WHERE name = @name
                             ;",
@@ -94,10 +94,14 @@ namespace Topics.Services.Implementations
                         Title = reader.GetString(1),
                         Description = reader.GetString(2),  
                         CoverImgSrc = ConvertToImage(ConvertToBase64(Utils.ConvertFromDBVal<byte[]>(reader.GetValue(3)))),
-                        AvatarImgSrc = ConvertToImage(ConvertToBase64(Utils.ConvertFromDBVal<byte[]>(reader.GetValue(5))))
+                        Owner = reader.GetString(4),
+                        AvatarImgSrc = ConvertToImage(ConvertToBase64(Utils.ConvertFromDBVal<byte[]>(reader.GetValue(5)))),
+                        Id = reader.GetInt32(6)
                     };
 
                     connection.Close();
+
+                    topic.Moderators = GetModerators(name);
                     
                     return topic;
                 } catch(Exception ex)
@@ -245,7 +249,7 @@ namespace Topics.Services.Implementations
                     {
                         Connection= connection,
                         CommandText = @"
-                            SELECT name, cover, title, description, avatar
+                            SELECT name, cover, title, description, avatar, id
                             FROM [Topic]
                             ;"
                     };
@@ -262,7 +266,8 @@ namespace Topics.Services.Implementations
                             CoverImgSrc = ConvertToImage(ConvertToBase64(Utils.ConvertFromDBVal<byte[]>(reader.GetValue(1)))),
                             Title = reader.GetString(2),
                             Description = reader.GetString(3),
-                            AvatarImgSrc = ConvertToImage(ConvertToBase64(Utils.ConvertFromDBVal<byte[]>(reader.GetValue(4))))
+                            AvatarImgSrc = ConvertToImage(ConvertToBase64(Utils.ConvertFromDBVal<byte[]>(reader.GetValue(4)))),
+                            Id = reader.GetInt32(5)
                         });
                     }
 
@@ -273,6 +278,98 @@ namespace Topics.Services.Implementations
                 {
                     Debug.WriteLine(e.Message);
                     return null;
+                }
+            }
+        }
+
+        public List<string> GetModerators(string topicName)
+        {
+            using (SqlConnection connection = new SqlConnection())
+            {
+                try
+                {
+                    connection.ConnectionString = ConnectionString;
+                    connection.Open();
+
+                    SqlCommand select = new SqlCommand()
+                    {
+                        Connection = connection,
+                        CommandText = @"
+                        SELECT moderatorName 
+                        FROM [Topic_Moderator] 
+                        WHERE topicName = @topicName
+                        ;"
+                    };
+
+                    select.Parameters.AddWithValue("topicName", topicName);
+
+                    List<string> moderators = new List<string>();
+
+                    SqlDataReader reader = select.ExecuteReader();
+
+                    while (reader.Read())
+                    {
+                        moderators.Add(reader.GetString(0));
+                    }
+
+                    connection.Close();
+
+                    return moderators;
+
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                    return null;
+                }
+            }
+        }
+
+        public bool EditTopic(TopicModel topic, string username)
+        {
+            using(SqlConnection connection = new SqlConnection())
+            {
+                try
+                {
+                    connection.ConnectionString = ConnectionString;
+                    connection.Open();
+
+                    SqlCommand update = new SqlCommand()
+                    {
+                        Connection = connection,
+                        CommandText = @"
+                            UPDATE [Topic]
+                            SET 
+                                name = @name,
+                                title = @title, 
+                                description = @description, 
+                                cover = @cover, 
+                                owner = @owner, 
+                                avatar = @avatar
+                            WHERE id = @id
+                            ;"
+                    };
+
+                    Debug.WriteLine(update.CommandText);
+
+                    update.Parameters.AddWithValue("id", topic.Id);
+                    update.Parameters.AddWithValue("name", topic.Name);
+                    update.Parameters.AddWithValue("title", topic.Title);
+                    update.Parameters.AddWithValue("description", topic.Description);
+                    update.Parameters.AddWithValue("cover", ConvertToBytes(topic.CoverImg));
+                    update.Parameters.AddWithValue("owner", username);
+                    update.Parameters.AddWithValue("avatar", ConvertToBytes(topic.AvatarImg));
+
+                    int rowsAffected = update.ExecuteNonQuery();
+
+                    connection.Close();
+
+                    return rowsAffected == 1;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex.Message);
+                    return false;
                 }
             }
         }

@@ -4,6 +4,7 @@
     string controllerName = ViewContext.RouteData.Values["controller"].ToString().ToLower();
     string actionName = ViewContext.RouteData.Values["action"].ToString().ToLower();
 }
+@using Topics.Models;
 
 <!DOCTYPE html>
 
@@ -23,10 +24,6 @@
     <header class="p-3 bg-dark text-white position-sticky top-0 z-index-2">
         <div class="container">
             <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-                <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
-                    <svg class="bi me-2" width="40" height="32" role="img" aria-label="Bootstrap"><use xlink:href="#bootstrap"></use></svg>
-                </a>
-
                 <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
                     <li>
                         <a href="/" class="nav-link px-2
@@ -45,16 +42,16 @@
                     @if (User.Identity.IsAuthenticated)
                     {
                         <li>
-                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal-create-topic">
+                            <div type="button" class="nav-link mx-2 text-white border border-white rounded" data-bs-toggle="modal" data-bs-target="#modal-create-topic">
                                 Create Topic
-                            </button>
+                            </div>
                         </li>
                         if (controllerName.Equals("topic") && actionName.Equals("get"))
                         {       
                             <li>
-                                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal-create-post">
+                                <div type="button" class="nav-link mx-2 text-white border border-white rounded" data-bs-toggle="modal" data-bs-target="#modal-create-post">
                                     Create Post
-                                </button>
+                                </div>
                             </li>
                         }
                     }
@@ -83,7 +80,7 @@
     <main>
         @if (User.Identity.IsAuthenticated)
         {
-            @Html.Partial("~/Views/Shared/ModalCreateTopic.cshtml", new Topics.Models.TopicModel())
+            @Html.Partial("~/Views/Shared/ModalTopic.cshtml", new Topics.Models.ModalTopicModel() { Id = "create-topic", Label = "Create Topic", Action = ActionType.Create })
 
             if (controllerName.Equals("topic") && actionName.Equals("get"))
             {

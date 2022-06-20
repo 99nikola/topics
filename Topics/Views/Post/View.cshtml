@@ -1,0 +1,53 @@
+﻿
+@{
+    ViewBag.Title = "View";
+    Layout = "~/Views/Shared/Layouts/MainLayout.cshtml";
+}
+
+@model Topics.Models.Post
+<div class="g-3 m-5">
+    <div class="d-flex g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
+        <div class="d-flex flex-column align-items-center width-max-content mx-3 my-2">
+            <a href="@Url.Action("UpVote/" + Model.Slug, "Post")"
+               class="text-decoration-none">
+                @if (ViewBag.UpVoted)
+                {
+                    <i class="bi bi-arrow-up-square-fill arrow-icon text-success"></i>
+                }
+                else
+                {
+                    <i class="bi bi-arrow-up-square arrow-icon text-black-50"></i>
+                }
+            </a>
+            @(Model.UpVotes - Model.DownVotes)
+            <a href="@Url.Action("DownVote/" + Model.Slug, "Post")"
+               class="text-decoration-none">
+                @if (ViewBag.DownVoted)
+                {
+                    <i class="bi bi-arrow-down-square-fill arrow-icon text-danger"></i>
+                }
+                else
+                {
+                    <i class="bi bi-arrow-down-square arrow-icon text-black-50"></i>
+                }
+            </a>
+        </div>
+
+        <div class="p-3 d-flex flex-column position-static">
+            <a href="@Url.Action("Get/" + Model.TopicName, "Topic")" class="width-max-content">
+                <strong class="d-inline-block text-secondary">@@@Model.TopicName</strong>
+            </a>
+            <h3 class="mb-0">@Model.Title</h3>
+            <div class="mb-1 text-muted">@Model.DateCreated.ToString("dd/MM/yyyy")</div>
+            <div class="text-decoration-none text-dark position-relative" name="Model-body">
+                <p class="card-text mb-auto">@Model.Content</p>
+            </div>
+            <a href="@Url.Action("View/" + Model.Slug, "Post", new { section = "comments" })" class="card-footer bg-white d-flex gap-3 text-decoration-none text-dark width-max-content">
+                <span class="border p-1 cursor-pointer rounded">
+                    <i class="bi bi-chat-square"></i>
+                    Comments
+                </span>
+            </a>
+        </div>
+    </div>
+</div>
