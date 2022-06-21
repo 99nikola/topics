@@ -1,0 +1,47 @@
+﻿@model Topics.Models.TopicModeratorModel
+
+<div class="modal fade" id="modal-add-moderator" tabindex="-1" aria-labelledby="Edit moderator" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Edit moderators</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body d-flex flex-column gap-4">
+
+
+                @using (Html.BeginForm("AddModerator", "Topic", FormMethod.Post, new {id = "form-add-moderator"}))
+                {
+                    @Html.AntiForgeryToken()
+                    
+                    @Html.TextBoxFor(model => model.TopicName, new { type="hidden" })
+
+                    <div class="form-group d-flex flex-column w-100 col">
+                        <div class="align-self-center">
+                            @Html.LabelFor(model => model.ModUsername, "Enter new moderator username", htmlAttributes: new { @class = "control-label" })
+                        </div>
+                        <div class="col-md-10 w-75 align-self-center">
+                            @Html.TextBoxFor(model => model.ModUsername, htmlAttributes: new { @class = "form-control" })
+                            @Html.ValidationMessageFor(model => model.ModUsername, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                }
+
+                <ol class="list-group">
+                    @foreach (string mod in Model.Mods)
+                    {
+                        <li class="list-group-item d-flex justify-content-between">
+                            <a href="#" class="link-primary text-decoration-none">@@@mod</a>
+                            @Html.ActionLink("Remove", "RemoveModerator", "Topic", new { username=mod, topicName=Model.TopicName }, new { @class = "btn btn-sm btn-danger" })
+                        </li>
+                    } 
+                </ol>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button form="form-add-moderator" type="submit" class="btn btn-primary">Add</button>
+            </div>
+        </div>
+    </div>
+</div>

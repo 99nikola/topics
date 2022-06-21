@@ -20,14 +20,24 @@ namespace Topics.Controllers
             this.postService = postService;
         }
 
-
         [HttpPost]
-        public ActionResult Create(Post post)
+        public ActionResult Create(ModalPostModel model)
         {
             Principal user = (Principal)HttpContext.User;
 
-            postService.CreatePost(post.TopicName, user.Username, post);
-            return RedirectToAction("Get/" + post.TopicName, "Topic", null);
+
+            postService.CreatePost(model.Post.TopicName, user.Username, model.Post);
+            return RedirectToAction("Get/" + model.Post.TopicName, "Topic", null);
+        }
+
+        [HttpPost]
+        public ActionResult Edit(ModalPostModel model)
+        {
+            Principal user = (Principal)HttpContext.User;
+
+
+            postService.EditPost(model.Post);
+            return RedirectToAction("Get/" + model.Post.TopicName, "Topic", null);
         }
 
         [HttpGet]
@@ -54,7 +64,7 @@ namespace Topics.Controllers
             ViewBag.UpVoted = postService.IsVotedPost(user.Username, id, true);
             ViewBag.DownVoted = postService.IsVotedPost(user.Username, id, false);
 
-            Post post = postService.GetPost(id);
+            PostModel post = postService.GetPost(id);
 
             return View(post);
         }

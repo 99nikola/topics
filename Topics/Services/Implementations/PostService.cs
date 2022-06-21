@@ -19,7 +19,7 @@ namespace Topics.Services.Implementations
                     ConnectionString;
         }
 
-        public bool CreatePost(string topicName, string username, Post post)
+        public bool CreatePost(string topicName, string username, PostModel post)
         {
             using (SqlConnection connection = new SqlConnection())
             {
@@ -137,7 +137,7 @@ namespace Topics.Services.Implementations
             }
         }
 
-        public List<Post> GetAllPost()
+        public List<PostModel> GetAllPost()
         {
             using (SqlConnection connection = new SqlConnection())
             {
@@ -150,25 +150,27 @@ namespace Topics.Services.Implementations
                     {
                         Connection = connection,
                         CommandText = @"
-                            SELECT slug, username, topicName, title, upVotes, downVotes, dateCreated, content
+                            SELECT slug, username, topicName, title, upVotes, downVotes, dateCreated, content, id
                             FROM [Post]
                             ;"
                     };
 
                     SqlDataReader reader = select.ExecuteReader();
-                    List<Post> posts = new List<Post>();
+                    List<PostModel> posts = new List<PostModel>();
 
                     while (reader.Read())
                     {
-                        posts.Add(new Post()
+                        posts.Add(new PostModel()
                         {
                             Slug = reader.GetString(0),
+                            Username = reader.GetString(1),
                             TopicName = reader.GetString(2),
                             Title = reader.GetString(3),
                             UpVotes = reader.GetInt32(4),
                             DownVotes = reader.GetInt32(5),
                             DateCreated = reader.GetDateTime(6),
-                            Content = reader.GetString(7)
+                            Content = reader.GetString(7),
+                            Id = reader.GetInt32(8)
                         });
                     }
 
@@ -196,7 +198,11 @@ namespace Topics.Services.Implementations
                     SqlCommand select = new SqlCommand()
                     {
                         Connection = connection,
-                        CommandText = @"SELECT postSlug FROM [Vote] WHERE username = @username AND vType = @type"
+                        CommandText = @"
+                            SELECT postSlug 
+                            FROM [Vote] 
+                            WHERE username = @username AND vType = @type
+                            "
                     };
 
                     select.Parameters.AddWithValue("username", username);
@@ -224,7 +230,7 @@ namespace Topics.Services.Implementations
             }
         }
 
-        public Post GetPost(string postSlug)
+        public PostModel GetPost(string postSlug)
         {
             using (SqlConnection connection = new SqlConnection())
             {
@@ -237,7 +243,7 @@ namespace Topics.Services.Implementations
                     {
                         Connection = connection,
                         CommandText = @"
-                            SELECT slug, username, topicName, title, upVotes, downVotes, dateCreated, content
+                            SELECT slug, username, topicName, title, upVotes, downVotes, dateCreated, content, id
                             FROM [Post]
                             WHERE slug = @slug
                             ;"
@@ -250,15 +256,17 @@ namespace Topics.Services.Implementations
                     if (!reader.Read())
                         return null;
 
-                    Post post = new Post()
+                    PostModel post = new PostModel()
                     {
                         Slug = reader.GetString(0),
+                        Username = reader.GetString(1),
                         TopicName = reader.GetString(2),
                         Title = reader.GetString(3),
                         UpVotes = reader.GetInt32(4),
                         DownVotes = reader.GetInt32(5),
                         DateCreated = reader.GetDateTime(6),
-                        Content = reader.GetString(7)
+                        Content = reader.GetString(7),
+                        Id = reader.GetInt32(8),
                     };
 
                     connection.Close();
@@ -309,7 +317,7 @@ namespace Topics.Services.Implementations
             }
         }
 
-        public List<Post> GetTopicPosts(string topicName)
+        public List<PostModel> GetTopicPosts(string topicName)
         {
             using(SqlConnection connection = new SqlConnection())
             {
@@ -322,7 +330,7 @@ namespace Topics.Services.Implementations
                     {
                         Connection = connection,
                         CommandText = @"
-                            SELECT slug, username, topicName, title, upVotes, downVotes, dateCreated, content 
+                            SELECT slug, username, topicName, title, upVotes, downVotes, dateCreated, content, id
                             FROM [Post]
                             WHERE topicName = @topicName
                             ;"
@@ -330,19 +338,21 @@ namespace Topics.Services.Implementations
                     select.Parameters.AddWithValue("topicName", topicName);
                     SqlDataReader reader = select.ExecuteReader();
 
-                    List<Post> posts = new List<Post>();
+                    List<PostModel> posts = new List<PostModel>();
 
                     while(reader.Read())
                     {
-                        posts.Add(new Post()
+                        posts.Add(new PostModel()
                         {
                             Slug = reader.GetString(0),
+                            Username = reader.GetString(1),
                             TopicName = reader.GetString(2),
                             Title = reader.GetString(3),
                             UpVotes = reader.GetInt32(4),
                             DownVotes = reader.GetInt32(5),
                             DateCreated = reader.GetDateTime(6),
-                            Content = reader.GetString(7)
+                            Content = reader.GetString(7),
+                            Id = reader.GetInt32(8)
                         });
                     }
 
@@ -354,6 +364,48 @@ namespace Topics.Services.Implementations
                 {
                     System.Diagnostics.Debug.WriteLine(ex.Message);
                     return null;
+                }
+            }
+        }
+
+        public bool EditPost(PostModel post)
+        {
+            using (SqlConnection connection = new SqlConnection())
+            {
+                try
+                {
+                    connection.ConnectionString = ConnectionString;
+                    connection.Open();
+
+                    SqlCommand update = new SqlCommand()
+                    {
+                        Connection = connection,
+                        CommandText = @"
+                            UPDATE [Post]
+                            SET 
+                                slug = @slug, 
+                                title = @title, 
+                                content = @content
+                            WHERE id = @id
+                            ;"
+                    };
+
+                    update.Parameters.AddWithValue("id", post.Id);
+                    update.Parameters.AddWithValue("title", post.Title);
+                    update.Parameters.AddWithValue("content", post.Content);
+                    update.Parameters.AddWithValue("slug", post.Slug);
+
+
+                    int rowsAffected = update.ExecuteNonQuery();
+
+                    connection.Close();
+
+                    return rowsAffected == 1;
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine(ex.Message);
+                    return false;
                 }
             }
         }

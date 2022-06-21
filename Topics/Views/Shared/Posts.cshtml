@@ -1,13 +1,18 @@
 ﻿
 @using Topics.Models;
 @using System.Collections.Generic;
+@using Topics.Auth;
+
+@{ 
+    Principal user = (Principal)HttpContext.Current.User;
+}
 
 @model Topics.Models.PostList
 
 
 <div class="row row-cols-1 g-3 m-5">
 
-    @foreach (Post post in Model.Posts)
+    @foreach (PostModel post in Model.Posts)
     {
         <div class="d-flex g-0 border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 position-relative">
             <div class="d-flex flex-column align-items-center width-max-content mx-3 my-2">
@@ -36,27 +41,35 @@
                 </a>
             </div>
 
-            <div class="p-3 d-flex flex-column position-static">
-                <a href="@Url.Action("Get/" + post.TopicName, "Topic")" class="width-max-content">
-                    <strong class="d-inline-block text-secondary">@@@post.TopicName</strong>
-                </a>
-                <h3 class="mb-0">@post.Title</h3>
-                <div class="mb-1 text-muted">@post.DateCreated.ToString("dd/MM/yyyy")</div>
-                <a href="@Url.Action("View/" + post.Slug, "Post")" class="text-decoration-none text-dark position-relative" name="post-body">
-                    <span name="span-child" class="bottom-0 position-absolute bg-light p-2 text-center opacity-95 w-100">Click to see a detailed view</span>
-                    <p class="card-text mb-auto m-h-100">@post.Content</p>
-                </a>
-                <a href="@Url.Action("View/" + post.Slug, "Post", new { section = "comments" })" class="card-footer bg-white d-flex gap-3 text-decoration-none text-dark width-max-content">
-                    <span class="border p-1 cursor-pointer rounded">
-                        <i class="bi bi-chat-square"></i>
-                        Comments
-                    </span>
-                </a>
+            <div class="d-flex w-100 justify-content-between align-items-start">
+                <div class="p-3 d-flex flex-column position-static">
+                    <a href="@Url.Action("Get/" + post.TopicName, "Topic")" class="width-max-content">
+                        <strong class="d-inline-block text-secondary">@@@post.TopicName</strong>
+                    </a>
+                    <h3 class="mb-0">@post.Title</h3>
+                    <div class="mb-1 text-muted">@post.DateCreated.ToString("dd/MM/yyyy")</div>
+                    <a href="@Url.Action("View/" + post.Slug, "Post")" class="text-decoration-none text-dark position-relative" name="post-body">
+                        <span name="span-child" class="bottom-0 position-absolute bg-light p-2 text-center opacity-95 w-100">Click to see a detailed view</span>
+                        <p class="card-text mb-auto m-h-100">@post.Content</p>
+                    </a>
+                    <a href="@Url.Action("View/" + post.Slug, "Post", new { section = "comments" })" class="card-footer bg-white d-flex gap-3 text-decoration-none text-dark width-max-content">
+                        <span class="border p-1 cursor-pointer rounded">
+                            <i class="bi bi-chat-square"></i>
+                            Comments
+                        </span>
+                    </a>
+                </div>
+                @if (user.Username.Equals(post.Username))
+                {
+                    <button class="btn btn-sm btn-warning m-3" data-bs-toggle="modal" data-bs-target="#modal-edit-topic-@post.Slug">Edit</button>
+                }
+                @Html.Partial("~/Views/Shared/ModalPost.cshtml", new ModalPostModel() { Id = "edit-topic-" + post.Slug, Label = "Edit Post", Action = ActionType.Edit, Post = post })
             </div>
         </div>
     }
        
 </div>
+
 
 
 <script>

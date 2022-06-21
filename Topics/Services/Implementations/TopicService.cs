@@ -350,8 +350,6 @@ namespace Topics.Services.Implementations
                             ;"
                     };
 
-                    Debug.WriteLine(update.CommandText);
-
                     update.Parameters.AddWithValue("id", topic.Id);
                     update.Parameters.AddWithValue("name", topic.Name);
                     update.Parameters.AddWithValue("title", topic.Title);
@@ -369,6 +367,75 @@ namespace Topics.Services.Implementations
                 catch (Exception ex)
                 {
                     Debug.WriteLine(ex.Message);
+                    return false;
+                }
+            }
+        }
+
+        public bool AddModerator(string username, string topicName)
+        {
+            using(SqlConnection connection = new SqlConnection())
+            {
+                try
+                {
+                    connection.ConnectionString = ConnectionString;
+                    connection.Open();
+
+                    SqlCommand insert = new SqlCommand()
+                    {
+                        Connection = connection,
+                        CommandText = @"INSERT INTO
+                        [Topic_Moderator] (moderatorName, topicName) 
+                        VALUES (@mod, @topic)
+                        ;"
+                    };
+
+                    insert.Parameters.AddWithValue("mod", username);
+                    insert.Parameters.AddWithValue("topic", topicName);
+
+                    int rowsAffected = insert.ExecuteNonQuery();
+                    connection.Close();
+
+                    return rowsAffected == 1;
+                } 
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine(ex.Message);
+                    return false;
+                }
+            }
+        }
+
+        public bool RemoveModerator(string username, string topicName)
+        {
+            using (SqlConnection connection = new SqlConnection())
+            {
+                try
+                {
+                    connection.ConnectionString = ConnectionString;
+                    connection.Open();
+
+                    SqlCommand delete = new SqlCommand()
+                    {
+                        Connection = connection,
+                        CommandText = @"
+                            DELETE FROM [Topic_Moderator]
+                            WHERE moderatorName = @username AND topicName = @topicName
+                            ;"
+                    };
+
+                    delete.Parameters.AddWithValue("username", username);
+                    delete.Parameters.AddWithValue("topicName", topicName);
+
+                    int rowsAffected = delete.ExecuteNonQuery();    
+
+                    connection.Close();
+
+                    return rowsAffected == 1;
+                }
+                catch(Exception ex)
+                {
+                    System.Diagnostics.Debug.Write(ex.Message);
                     return false;
                 }
             }

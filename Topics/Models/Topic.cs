@@ -65,7 +65,7 @@ namespace Topics.Models
         {
             return topicService.IsMember(this, username);
         }
-        public List<Post> Posts { get; set; }
+        public List<PostModel> Posts { get; set; }
 
         public string Owner { get; set; }
         public List<string> Moderators { get; set; }

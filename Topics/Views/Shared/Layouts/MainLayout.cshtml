@@ -80,11 +80,11 @@
     <main>
         @if (User.Identity.IsAuthenticated)
         {
-            @Html.Partial("~/Views/Shared/ModalTopic.cshtml", new Topics.Models.ModalTopicModel() { Id = "create-topic", Label = "Create Topic", Action = ActionType.Create })
+            @Html.Partial("~/Views/Shared/ModalTopic.cshtml", new Topics.Models.ModalTopicModel() { Id = "create-topic", Label = "Create Topic", Action = ActionType.Create, Topic = new TopicModel() })
 
             if (controllerName.Equals("topic") && actionName.Equals("get"))
             {
-                @Html.Partial("~/Views/Shared/ModalCreatePost.cshtml", new Topics.Models.Post())
+                @Html.Partial("~/Views/Shared/ModalPost.cshtml", new Topics.Models.ModalPostModel() { Id = "create-post", Label = "Create Post", Action = ActionType.Create, Post = new PostModel()})
             }
         }
         @RenderBody()

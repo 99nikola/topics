@@ -5,6 +5,8 @@
     ViewBag.Title = "GetTopic";
     Layout = "~/Views/Shared/Layouts/MainLayout.cshtml";
     Principal user = (Principal)HttpContext.Current.User;
+    bool isOwner = user.Username.Equals(Model.Owner);
+    bool isMod = Model.Moderators.Contains(user.Username);
 }
 @model Topics.Models.TopicModel
 
@@ -14,17 +16,18 @@
 } else
 {
 
-    <div class="container">
-        <div class="p-1 mb-4 d-flex flex-column">
+<div class="container">
+    <div class="p-1 mb-4 d-flex flex-column">
 
-            @if (string.IsNullOrEmpty(Model.CoverImgSrc))
-            {
-                <div class="rounded bg-dark cover"></div>
-            } else
-            {
-                <img src="@Model.CoverImgSrc" class="cover" alt="Cover image"/>
-            }
-
+        @if (string.IsNullOrEmpty(Model.CoverImgSrc))
+        {
+            <div class="rounded bg-dark cover"></div>
+        }
+        else
+        {
+            <img src="@Model.CoverImgSrc" class="cover" alt="Cover image" />
+        }
+        
         <div class="d-flex align-items-md-center justify-content-md-between px-5 py-2 gap-3 flex-column border rounded overflow-hidden flex-md-row mb-4 shadow-sm h-md-250 w-75 align-self-center translate-middle-y bg-light">
             <div class="d-flex align-items-center gap-2 justify-content-center">
                 @if (string.IsNullOrEmpty(Model.AvatarImgSrc))
@@ -39,56 +42,72 @@
             </div>
             <div class="btn-group btn-group-lg">
 
-            @if (ViewBag.IsMember)
-            {
-                @Html.ActionLink("Leave", "Leave/" + Model.Name, "Topic", null, new { @class = "btn btn-lg btn-danger" })
-            }
-            else
-            {
-                @Html.ActionLink("Join", "Join/" + Model.Name, "Topic", null, new { @class = "btn btn-lg btn-primary" })
-            }
-            @if (user.Username.Equals(Model.Owner))
-            {
-                <button class="btn btn-lg btn-warning" data-bs-toggle="modal" data-bs-target="#modal-edit-topic">Edit</button>
-            }
+                @if (isMod)
+                {
+                    <button class="btn btn-lg btn-warning" data-bs-toggle="modal" data-bs-target="#modal-edit-topic">Edit</button>
+                }
+                else if (isOwner)
+                {
+                    <button class="btn btn-lg btn-warning" data-bs-toggle="modal" data-bs-target="#modal-edit-topic">Edit</button>
+                    @Html.ActionLink("Delete", "Delete/" + Model.Name, "Topic", null, new { @class = "btn btn-lg btn-danger" })
+                }
+                else if (ViewBag.IsMember)
+                {
+                    @Html.ActionLink("Leave", "Leave/" + Model.Name, "Topic", null, new { @class = "btn btn-lg btn-danger" })
+                }
+                else
+                {
+                    @Html.ActionLink("Join", "Join/" + Model.Name, "Topic", null, new { @class = "btn btn-lg btn-primary" })
+                }
             </div>
         </div>
+    </div>
+    @if (isOwner || isMod)
+    {
+        @Html.Partial("~/Views/Shared/ModalTopic.cshtml", new ModalTopicModel() { Id = "edit-topic", Topic = Model, Label = "Edit Topic", Action = ActionType.Edit })
+        @Html.Partial("~/Views/Shared/ModalAddModarator.cshtml", new TopicModeratorModel() { Mods = Model.Moderators, TopicName = Model.Name })
+    }
+
+    <div class="row g-5">
+        <div class="col-md-8">
+            @Html.Partial("~/Views/Shared/Posts.cshtml", new PostList() { Posts = Model.Posts })
         </div>
 
-        @Html.Partial("~/Views/Shared/ModalTopic.cshtml", new ModalTopicModel() { Id = "edit-topic", Topic = Model, Label = "Edit Topic", Action = ActionType.Edit})
+        <div class="col-md-4">
+            <div class="position-sticky" style="top: 2rem;">
+                <div class="p-4 mb-3 bg-light rounded">
+                    <h4 class="fst-italic">About</h4>
+                    <p class="mb-0">@Model.Description</p>
+                </div>
 
-        <div class="row g-5">
-            <div class="col-md-8">
-                @Html.Partial("~/Views/Shared/Posts.cshtml", new PostList() { Posts = Model.Posts })
-            </div>
+                <div class="p-4">
+                    <h4 class="fst-italic">Owner</h4>
+                    <ol class="list-unstyled mb-0">
+                        <li><a href="#" class="link-primary text-decoration-none">@@@Model.Owner</a></li>
+                    </ol>
+                </div>
 
-            <div class="col-md-4">
-                <div class="position-sticky" style="top: 2rem;">
-                    <div class="p-4 mb-3 bg-light rounded">
-                        <h4 class="fst-italic">About</h4>
-                        <p class="mb-0">@Model.Description</p>
-                    </div>
-
-                    <div class="p-4">
-                        <h4 class="fst-italic">Owner</h4>
-                        <ol class="list-unstyled mb-0">
-                            <li><a href="#")>@Model.Owner</a></li>
-                        </ol>
-                    </div>
-
-                    <div class="p-4">
+                <div class="p-4">
+                    <div class="d-flex gap-1 align-items-center">
                         <h4 class="fst-italic">Moderatos</h4>
-                        <ol class="list-unstyled">
-                            @foreach (string mod in Model.Moderators)
-                            {
-                                <li><a href="#">@mod</a></li>
-                            }
-                        </ol>
+                        @if (isOwner)
+                        {
+                            <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modal-add-moderator">Edit</button>
+                        }
                     </div>
+                    <ol class="list-group my-2">
+                        @foreach (string mod in Model.Moderators)
+                        {
+                            <li class="list-group-item">
+                                <a href="#" class="link-primary text-decoration-none">@@@mod</a>
+                            </li>
+                        }
+                    </ol>
                 </div>
             </div>
         </div>
-
     </div>
+
+</div>
 }
 

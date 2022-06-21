@@ -8,12 +8,14 @@ namespace Topics.Models
 {
     public class PostList
     {
-        public List<Post> Posts { get; set; }
+        public List<PostModel> Posts { get; set; }
     }
 
-    public class Post
+    public class PostModel
     {
         public int Id { get; set; }
+
+        public string Username { get; set; }
 
         [Required(ErrorMessage = "Slug is required")]
         public string Slug { get; set; }

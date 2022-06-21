@@ -48,26 +48,28 @@ namespace Topics.Controllers
         }
 
         [HttpPost]
-        public ActionResult Create(TopicModel model)
+        public ActionResult Create(ModalTopicModel model)
         {
             if (!ModelState.IsValid)
                 return Redirect("/");
 
             Principal user = (Principal)HttpContext.User;
 
-            topicService.CreateTopic(model, user.Username);
+            topicService.CreateTopic(model.Topic, user.Username);
             return Redirect(Request.UrlReferrer.ToString());
         }
 
         [HttpPost]
-        public ActionResult Edit(TopicModel model)
+        public ActionResult Edit(ModalTopicModel model)
         {
+            System.Diagnostics.Debug.WriteLine(model.Id);
+
             if (!ModelState.IsValid)
                 return Redirect("/");
 
             Principal user = (Principal)HttpContext.User;
 
-            topicService.EditTopic(model, user.Username);
+            topicService.EditTopic(model.Topic, user.Username);
             return Redirect(Request.UrlReferrer.ToString());
         }
 
@@ -91,6 +93,35 @@ namespace Topics.Controllers
             return Redirect(Request.UrlReferrer.ToString());
         }
         
+        [HttpPost]
+        public ActionResult AddModerator(TopicModeratorModel mod) 
+        {
+            if (!ModelState.IsValid)
+                return Redirect(Request.UrlReferrer.ToString());
+
+            TopicModel topic = topicService.GetTopic(mod.TopicName);
+            Principal user = (Principal)HttpContext.User;
+
+            if (!topic.Owner.Equals(user.Username))
+                return Redirect(Request.UrlReferrer.ToString());
+
+            topicService.AddModerator(mod.ModUsername, mod.TopicName);
+            return Redirect(Request.UrlReferrer.ToString());
+        }
+
+        public ActionResult RemoveModerator(string username, string topicName)
+        {
+            
+            TopicModel topic = topicService.GetTopic(topicName);
+            Principal user = (Principal)HttpContext.User;
+
+            if (!topic.Owner.Equals(user.Username))
+                return Redirect(Request.UrlReferrer.ToString());
+
+            topicService.RemoveModerator(username, topicName);
+
+            return Redirect(Request.UrlReferrer.ToString());
+        }
     }
 
 }

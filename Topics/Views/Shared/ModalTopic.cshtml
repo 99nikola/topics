@@ -14,10 +14,8 @@
             {
                 @Html.AntiForgeryToken()
 
-                if (Model.Topic != null)
-                {
-                    @Html.EditorFor(model => model.Id, new { htmlAttributes = new { type = "hidden", @Value = Model.Topic.Id.ToString() } })
-                }
+                @Html.EditorFor(model => model.Topic.Id, new { htmlAttributes = new { type = "hidden", @Value = Model.Topic.Id } })
+                
                 <div class="form d-flex flex-column align-items-center row gy-3">
                     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 

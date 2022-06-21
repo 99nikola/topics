@@ -13,5 +13,8 @@ namespace Topics.Services.Interfaces
         List<TopicModel> GetTopics();
         List<string> GetModerators(string topicName);
         bool EditTopic(TopicModel topic, string username);
+        bool AddModerator(string username, string topicName);
+        bool RemoveModerator(string username, string topicName);
+
     }
 }
