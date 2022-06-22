@@ -42,7 +42,7 @@
             </div>
 
             <div class="d-flex w-100 justify-content-between align-items-start">
-                <div class="p-3 d-flex flex-column position-static">
+                <div class="p-3 d-flex flex-column align-items-start position-static w-100">
                     <a href="@Url.Action("Get/" + post.TopicName, "Topic")" class="width-max-content">
                         <strong class="d-inline-block text-secondary">@@@post.TopicName</strong>
                     </a>
@@ -52,12 +52,14 @@
                         <span name="span-child" class="bottom-0 position-absolute bg-light p-2 text-center opacity-95 w-100">Click to see a detailed view</span>
                         <p class="card-text mb-auto m-h-100">@post.Content</p>
                     </a>
-                    <a href="@Url.Action("View/" + post.Slug, "Post", new { section = "comments" })" class="card-footer bg-white d-flex gap-3 text-decoration-none text-dark width-max-content">
-                        <span class="border p-1 cursor-pointer rounded">
-                            <i class="bi bi-chat-square"></i>
-                            Comments
-                        </span>
-                    </a>
+                    <div class="card-footer bg-white py-3 w-100">
+                        <a href="@Url.Action("View/" + post.Slug, "Post", new { section = "comments" })" class="text-decoration-none text-dark width-max-content">
+                            <span class="border p-1 cursor-pointer rounded">
+                                <i class="bi bi-chat-square"></i>
+                                Comments
+                            </span>
+                        </a>
+                    </div>
                 </div>
                 @if (user.Username.Equals(post.Username))
                 {
@@ -75,10 +77,16 @@
 <script>
     const postsBody = document.getElementsByName("post-body");
 
-    postsBody.forEach(postBody => {
-        if (postBody.clientHeight >= 100) return;
+    const onResize = () => {
+        postsBody.forEach(postBody => {
+            const span = postBody.children.namedItem("span-child");
+            if (postBody.clientHeight >= 100)
+                span.style.visibility = "visible";
+            else span.style.visibility = "hidden";
+        })
+    }
 
-        const span = postBody.children.namedItem("span-child");
-        span.style.visibility = "hidden";
-    })
+    onResize();
+    window.addEventListener("resize", onResize);
+
 </script>

@@ -149,7 +149,7 @@ CREATE TABLE [Comment] (
 	parent INT,
 	ownerUsername VARCHAR(64) NOT NULL,
 	postSlug VARCHAR(256),
-	topicName VARCHAR(64),
+	content TEXT,
 
 	CONSTRAINT FK_Comment_parent
 	FOREIGN KEY (parent)
@@ -168,4 +168,23 @@ CREATE TABLE [Comment] (
 	REFERENCES [Post](slug) 
 	ON DELETE CASCADE
 	ON UPDATE CASCADE
+);
+
+
+CREATE TABLE [Vote] (
+	username VARCHAR(64),
+	commentId INT,
+	vType BIT,
+
+	PRIMARY KEY(username, commentId),
+
+	CONSTRAINT FK_VoteComment_username
+	FOREIGN KEY (username)
+	REFERENCES [User](username),
+
+	CONSTRAINT FK_VoteComment_commentId
+	FOREIGN KEY (commentId)
+	REFERENCES [Comment](id)
+	ON DELETE CASCADE
+	ON UPDATE CASCADE,
 );

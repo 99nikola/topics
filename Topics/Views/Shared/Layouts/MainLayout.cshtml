@@ -84,7 +84,7 @@
 
             if (controllerName.Equals("topic") && actionName.Equals("get"))
             {
-                @Html.Partial("~/Views/Shared/ModalPost.cshtml", new Topics.Models.ModalPostModel() { Id = "create-post", Label = "Create Post", Action = ActionType.Create, Post = new PostModel()})
+                @Html.Partial("~/Views/Shared/ModalPost.cshtml", new Topics.Models.ModalPostModel() { Id = "create-post", Label = "Create Post", Action = ActionType.Create, Post = new PostModel() { TopicName = ViewBag.TopicName } })
             }
         }
         @RenderBody()

@@ -73,7 +73,7 @@ namespace Topics.Services.Implementations
                         Connection = connection,
                         CommandText = @"
                             SELECT vType 
-                            FROM [Vote] 
+                            FROM [VotePost] 
                             WHERE username = @username AND postSlug = @slug
                             ;"
                     };
@@ -94,7 +94,7 @@ namespace Topics.Services.Implementations
                         {
                             command.CommandText = @"
                                 DELETE 
-                                FROM [Vote] 
+                                FROM [VotePost] 
                                 WHERE username = @username AND postSlug = @slug
                                 ;";
 
@@ -105,7 +105,7 @@ namespace Topics.Services.Implementations
                         }
 
                         command.CommandText = @"
-                            UPDATE [Vote] 
+                            UPDATE [VotePost] 
                             SET vType = @type
                             WHERE username = @username AND postSlug = @slug
                             ;";
@@ -120,7 +120,7 @@ namespace Topics.Services.Implementations
 
                     command.CommandText = @"
                         INSERT INTO 
-                        [Vote] (username, postSlug, vType) 
+                        [VotePost] (username, postSlug, vType) 
                         VALUES (@username, @slug, @type)
                         ;";
 
@@ -200,7 +200,7 @@ namespace Topics.Services.Implementations
                         Connection = connection,
                         CommandText = @"
                             SELECT postSlug 
-                            FROM [Vote] 
+                            FROM [VotePost] 
                             WHERE username = @username AND vType = @type
                             "
                     };
@@ -295,7 +295,7 @@ namespace Topics.Services.Implementations
                         Connection = connection,
                         CommandText = @"
                             SELECT postSlug 
-                            FROM [Vote] 
+                            FROM [VotePost] 
                             WHERE username = @username AND vType = @type AND postSlug = @slug
                             ;"
                     };

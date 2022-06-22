@@ -16,6 +16,7 @@
                     @Html.AntiForgeryToken()
                    
                     @Html.EditorFor(model => model.Post.Id, new { htmlAttributes = new { type = "hidden" } })
+                    @Html.EditorFor(model => model.Post.TopicName, new { htmlAttributes = new { type = "hidden" } })
     
 
                     <div class="form d-flex flex-column align-items-center row gy-3">

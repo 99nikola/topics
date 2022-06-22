@@ -25,7 +25,6 @@ namespace Topics.Controllers
         {
             Principal user = (Principal)HttpContext.User;
 
-
             postService.CreatePost(model.Post.TopicName, user.Username, model.Post);
             return RedirectToAction("Get/" + model.Post.TopicName, "Topic", null);
         }
@@ -34,9 +33,11 @@ namespace Topics.Controllers
         public ActionResult Edit(ModalPostModel model)
         {
             Principal user = (Principal)HttpContext.User;
+            PostModel post = postService.GetPost(model.Post.Slug);
 
+            if (user.Username.Equals(post.Username))
+                postService.EditPost(model.Post);
 
-            postService.EditPost(model.Post);
             return RedirectToAction("Get/" + model.Post.TopicName, "Topic", null);
         }
 
